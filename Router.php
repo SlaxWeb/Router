@@ -134,7 +134,7 @@ class Router
         if ($uri !== "/") {
             $uri = ltrim($uri, "/");
         }
-        $this->_request["uri"] = $uri;
+        $this->_request["uri"] = $uri === "/" ? $uri : rtrim($uri, "/");
     }
 
     protected function _throwNoRouteException($request)
