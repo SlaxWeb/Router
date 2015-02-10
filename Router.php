@@ -19,7 +19,7 @@ class Router
             $options["uri"] = "/";
         }
         if (empty($options["method"]) === true) {
-            $options["method"] = "get";
+            $options["method"] = "GET";
         }
         $this->_request = $options;
         $this->prepareUri();
@@ -46,6 +46,12 @@ class Router
     public function delete()
     {
         $this->_method = "DELETE";
+        return $this;
+    }
+
+    public function cli()
+    {
+        $this->_method = "CLI";
         return $this;
     }
 
