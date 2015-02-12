@@ -12,6 +12,7 @@ class Router
     protected $_routes = [];
     protected $_request = [];
     protected $_params = [];
+    protected $_routed = [];
 
     public function __construct(array $options)
     {
@@ -133,10 +134,20 @@ class Router
         if (count($this->_params) < $params) {
             $this->_throwNoRouteException($this->_request);
         }
+        $this->_routed = [
+            "uri"       =>  $uri,
+            "action"    =>  $action,
+            "params"    =>  $params
+        ];
         return [
             "action"    =>  $routeData[$route]["action"],
             "params"    =>  $this->_params
         ];
+    }
+
+    public function getRouted()
+    {
+        return $this->_routed;
     }
 
     protected function prepareUri()
