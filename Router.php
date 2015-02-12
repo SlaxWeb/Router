@@ -28,6 +28,7 @@ class Router
     public function defaultRoute()
     {
         $this->_name = "*";
+        return $this;
     }
 
     public function get()
@@ -115,11 +116,11 @@ class Router
                 break;
             }
         }
-        if ($action === null && isset($this->_routes[$this->_request["method"]["*"]])) {
-            $action = $this->_request["method"]["*"]["action"];
+        if ($action === null && isset($this->_routes[$this->_request["method"]]["*"])) {
+            $action = $this->_routes[$this->_request["method"]]["*"]["action"];
             $uri = $this->_request["uri"];
             $route = "*";
-            $params = $this->_request["method"]["*"]["params"];
+            $params = $this->_routes[$this->_request["method"]]["*"]["params"];
         }
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
