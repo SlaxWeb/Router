@@ -103,11 +103,12 @@ class Router
         if (isset($this->_routes[$this->_request["method"]]) === false) {
             $this->_throwNoRouteException($this->_request);
         }
+        $routeData = $this->_routes[$this->_request["method"]];
         $action = null;
         $uri = "";
         $route = "";
         $params = "";
-        foreach ($this->_routes[$this->_request["method"]] as $r => $a) {
+        foreach ($routeData as $r => $a) {
             if (strpos($this->_request["uri"], $r) === 0) {
                 $action = $a["action"];
                 $uri = $this->_request["uri"];
@@ -116,11 +117,11 @@ class Router
                 break;
             }
         }
-        if ($action === null && isset($this->_routes[$this->_request["method"]]["*"])) {
-            $action = $this->_routes[$this->_request["method"]]["*"]["action"];
+        if ($action === null && isset($routeData["*"])) {
+            $action = $routeData["*"]["action"];
             $uri = $this->_request["uri"];
             $route = "*";
-            $params = $this->_routes[$this->_request["method"]]["*"]["params"];
+            $params = $routeData["*"]["params"];
         }
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
@@ -133,7 +134,7 @@ class Router
             $this->_throwNoRouteException($this->_request);
         }
         return [
-            "action"    =>  $this->_routes[$this->_request["method"]][$route]["action"],
+            "action"    =>  $routeData[$route]["action"],
             "params"    =>  $this->_params
         ];
     }
