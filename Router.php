@@ -92,11 +92,6 @@ class Router
         return $this;
     }
 
-    public function test()
-    {
-        var_dump($this->_routes);
-    }
-
     public function process()
     {
         if (isset($this->_routes[$this->_request["method"]]) === false) {
