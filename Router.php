@@ -25,6 +25,11 @@ class Router
         $this->prepareUri();
     }
 
+    public function defaultRoute()
+    {
+        $this->_name = "*";
+    }
+
     public function get()
     {
         $this->_method = "GET";
@@ -109,6 +114,12 @@ class Router
                 $params = $a["params"];
                 break;
             }
+        }
+        if ($action === null && isset($this->_routes[$this->_request["method"]["*"]])) {
+            $action = $this->_request["method"]["*"]["action"];
+            $uri = $this->_request["uri"];
+            $route = "*";
+            $params = $this->_request["method"]["*"]["params"];
         }
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
