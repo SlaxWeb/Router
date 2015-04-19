@@ -77,7 +77,7 @@ class Router
         if ($this->_name === "") {
             throw new E\NoNameException("Route needs a name", 500);
         }
-        if (is_array($action) === false && is_callable($action) === false) {
+        if (is_callable($action) === false) {
             throw new E\InvalidActionException("Action must be in form of an array or a callable", 500);
         }
 
