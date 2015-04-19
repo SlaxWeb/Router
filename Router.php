@@ -16,14 +16,14 @@ class Router
 
     public function __construct(array $options)
     {
-        if (empty($options["uri"]) === true) {
+        if (isset($options["uri"]) === false || $options["uri"] === null) {
             $options["uri"] = "/";
         }
-        if (empty($options["method"]) === true) {
+        if (isset($options["method"]) === false || $options["method"] === null) {
             $options["method"] = "GET";
         }
         $this->_request = $options;
-        $this->prepareUri();
+        $this->_prepareUri();
     }
 
     public function defaultRoute()
@@ -150,7 +150,7 @@ class Router
         return $this->_routed;
     }
 
-    protected function prepareUri()
+    protected function _prepareUri()
     {
         $uri = $this->_request["uri"];
         if (strpos($uri, "/index.php") !== false) {
