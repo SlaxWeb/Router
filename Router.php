@@ -64,6 +64,9 @@ class Router
 
     public function name($name)
     {
+        if ($name === null) {
+            throw new E\InvalidNameException("Route name can not be null", 500);
+        }
         $this->_name = $name;
         return $this;
     }
@@ -71,22 +74,11 @@ class Router
     public function action($action)
     {
         $this->_action = $action;
-        return $this;
-    }
-
-    public function params($count)
-    {
-        $this->_paramCount = $count;
-        return $this;
-    }
-
-    public function store()
-    {
-        if (empty($this->_name) === true) {
+        if ($this->_name === "") {
             throw new E\NoNameException("Route needs a name", 500);
         }
-        if (empty($this->_action) === true) {
-            throw new E\NoActionException("Route needs an action", 500);
+        if (is_array($action) === false || is_callable($action) === false) {
+            throw new E\InvalidActionException("Action must be in form of an array or a callable", 500);
         }
 
         $this->_routes[$this->_method][$this->_name] = ["action" => $this->_action, "params" => $this->_paramCount];
@@ -96,6 +88,12 @@ class Router
         $this->_action = null;
         $this->_paramCount = 0;
 
+        return $this;
+    }
+
+    public function params($count)
+    {
+        $this->_paramCount = $count;
         return $this;
     }
 
@@ -110,28 +108,19 @@ class Router
         $route = "";
         $params = "";
         foreach ($routeData as $r => $a) {
-            if (strpos($this->_request["uri"], $r) === 0) {
+            $matches = null;
+            if (in_array(preg_match_all("~{$r}~", $this->_request["uri"], $mathces), [0, false]) === false) {
+                foreach ($matches as $m) {
+                    $params[] = $m[0];
+                }
                 $action = $a["action"];
-                $uri = $this->_request["uri"];
+                $uri = array_shift($params);
                 $route = $r;
-                $params = $a["params"];
+                $params = array_filter($params);
                 break;
             }
         }
-        if ($action === null && isset($routeData["*"])) {
-            $action = $routeData["*"]["action"];
-            $uri = $this->_request["uri"];
-            $route = "*";
-            $params = $routeData["*"]["params"];
-        }
         if ($action === null) {
-            $this->_throwNoRouteException($this->_request);
-        }
-        $reqParams = substr($uri, strlen($route) + 1);
-        if ($reqParams !== false) {
-            $this->_params = explode("/", substr($uri, strlen($route) + 1));
-        }
-        if (count($this->_params) < $params) {
             $this->_throwNoRouteException($this->_request);
         }
         $this->_routed = [
@@ -140,8 +129,9 @@ class Router
             "params"    =>  $params
         ];
         return [
-            "action"    =>  $routeData[$route]["action"],
-            "params"    =>  $this->_params
+            "action"    =>  $action,
+            "params"    =>  $params,
+            "callable"  =>  is_callable($action)
         ];
     }
 
