@@ -77,7 +77,7 @@ class Router
         if ($this->_name === "") {
             throw new E\NoNameException("Route needs a name", 500);
         }
-        if (is_array($action) === false || is_callable($action) === false) {
+        if (is_array($action) === false && is_callable($action) === false) {
             throw new E\InvalidActionException("Action must be in form of an array or a callable", 500);
         }
 
@@ -109,7 +109,8 @@ class Router
         $params = "";
         foreach ($routeData as $r => $a) {
             $matches = null;
-            if (in_array(preg_match_all("~{$r}~", $this->_request["uri"], $mathces), [0, false]) === false) {
+            $r = str_replace("/", "\\/", $r);
+            if (in_array(preg_match_all("~^{$r}$~", $this->_request["uri"], $matches), [0, false]) === false) {
                 foreach ($matches as $m) {
                     $params[] = $m[0];
                 }
@@ -120,14 +121,17 @@ class Router
                 break;
             }
         }
+
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
         }
+
         $this->_routed = [
             "uri"       =>  $uri,
             "action"    =>  $action,
             "params"    =>  $params
         ];
+
         return [
             "action"    =>  $action,
             "params"    =>  $params,
