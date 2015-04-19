@@ -12,6 +12,7 @@ class Router
     protected $_routes = [];
     protected $_request = [];
     protected $_params = [];
+    protected $_routed = [];
 
     public function __construct(array $options)
     {
@@ -23,6 +24,12 @@ class Router
         }
         $this->_request = $options;
         $this->prepareUri();
+    }
+
+    public function defaultRoute()
+    {
+        $this->_name = "*";
+        return $this;
     }
 
     public function get()
@@ -92,21 +99,17 @@ class Router
         return $this;
     }
 
-    public function test()
-    {
-        var_dump($this->_routes);
-    }
-
     public function process()
     {
         if (isset($this->_routes[$this->_request["method"]]) === false) {
             $this->_throwNoRouteException($this->_request);
         }
+        $routeData = $this->_routes[$this->_request["method"]];
         $action = null;
         $uri = "";
         $route = "";
         $params = "";
-        foreach ($this->_routes[$this->_request["method"]] as $r => $a) {
+        foreach ($routeData as $r => $a) {
             if (strpos($this->_request["uri"], $r) === 0) {
                 $action = $a["action"];
                 $uri = $this->_request["uri"];
@@ -114,6 +117,12 @@ class Router
                 $params = $a["params"];
                 break;
             }
+        }
+        if ($action === null && isset($routeData["*"])) {
+            $action = $routeData["*"]["action"];
+            $uri = $this->_request["uri"];
+            $route = "*";
+            $params = $routeData["*"]["params"];
         }
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
@@ -125,10 +134,20 @@ class Router
         if (count($this->_params) < $params) {
             $this->_throwNoRouteException($this->_request);
         }
+        $this->_routed = [
+            "uri"       =>  $uri,
+            "action"    =>  $action,
+            "params"    =>  $params
+        ];
         return [
-            "action"    =>  $this->_routes[$this->_request["method"]][$route]["action"],
+            "action"    =>  $routeData[$route]["action"],
             "params"    =>  $this->_params
         ];
+    }
+
+    public function getRouted()
+    {
+        return $this->_routed;
     }
 
     protected function prepareUri()
