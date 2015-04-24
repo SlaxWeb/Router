@@ -2,3 +2,5 @@
 **.swp
 **.directory
 **.session.vim
+composer.lock
+vendor/
