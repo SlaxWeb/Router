@@ -8,7 +8,6 @@ class Router
     protected $_method = "GET";
     protected $_name = "";
     protected $_action = null;
-    protected $_paramCount = 0;
     protected $_routes = [];
     protected $_request = null;
     protected $_params = [];
@@ -74,19 +73,12 @@ class Router
             throw new E\InvalidActionException("Action must be callable", 500);
         }
 
-        $this->_routes[$this->_method][$this->_name] = ["action" => $this->_action, "params" => $this->_paramCount];
+        $this->_routes[$this->_method][$this->_name] = ["action" => $this->_action];
 
         $this->_method = "GET";
         $this->_name = "";
         $this->_action = null;
-        $this->_paramCount = 0;
 
-        return $this;
-    }
-
-    public function params($count)
-    {
-        $this->_paramCount = $count;
         return $this;
     }
 
