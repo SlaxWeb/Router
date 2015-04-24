@@ -78,7 +78,7 @@ class Router
             throw new E\NoNameException("Route needs a name", 500);
         }
         if (is_callable($action) === false) {
-            throw new E\InvalidActionException("Action must be in form of an array or a callable", 500);
+            throw new E\InvalidActionException("Action must be callable", 500);
         }
 
         $this->_routes[$this->_method][$this->_name] = ["action" => $this->_action, "params" => $this->_paramCount];
