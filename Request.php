@@ -1,5 +1,5 @@
 <?php
-namespace \SlaxWeb\Router;
+namespace SlaxWeb\Router;
 
 use SlaxWeb\Router\Exceptions as E;
 

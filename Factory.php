@@ -1,5 +1,5 @@
 <?php
-namespace \SlaxWeb\Router;
+namespace SlaxWeb\Router;
 
 use SlaxWeb\Router\Router;
 use SlaxWeb\Router\Request;
