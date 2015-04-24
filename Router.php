@@ -101,8 +101,7 @@ class Router
 
         return [
             "action"    =>  $action,
-            "params"    =>  $params,
-            "callable"  =>  is_array($action) === false
+            "params"    =>  $params
         ];
     }
 
