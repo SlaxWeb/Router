@@ -1,4 +1,4 @@
 <?php
-namespace \SlaxWeb\Router\Exceptions;
+namespace SlaxWeb\Router\Exceptions;
 
 class RequestException extends \Exception {}
