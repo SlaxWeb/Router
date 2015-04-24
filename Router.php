@@ -10,7 +10,6 @@ class Router
     protected $_action = null;
     protected $_routes = [];
     protected $_request = null;
-    protected $_params = [];
     protected $_routed = [];
 
     public function __construct(Request $request)
@@ -18,39 +17,22 @@ class Router
         $this->_request = $request;
     }
 
+    public function __call($method, $params)
+    {
+        if (in_array($method, ["get", "post", "put", "delete", "cli"])) {
+            $this->_method = strtoupper($method);
+            return $this;
+        }
+        if (method_exists($this, $method)) {
+            return $this->{$method}(...$params);
+        }
+
+        throw new \Exception("Method not found in \\SlaxWeb\\Router\\Router", 500);
+    }
+
     public function defaultRoute()
     {
         $this->_name = "*";
-        return $this;
-    }
-
-    public function get()
-    {
-        $this->_method = "GET";
-        return $this;
-    }
-
-    public function post()
-    {
-        $this->_method = "POST";
-        return $this;
-    }
-
-    public function put()
-    {
-        $this->_method = "PUT";
-        return $this;
-    }
-
-    public function delete()
-    {
-        $this->_method = "DELETE";
-        return $this;
-    }
-
-    public function cli()
-    {
-        $this->_method = "CLI";
         return $this;
     }
 
