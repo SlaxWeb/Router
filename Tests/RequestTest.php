@@ -11,7 +11,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
         $req->setUpRequest($host, $method, $uri, $filename);
 
-        $this->assertEquals("/test/uri", $req->uri);
+        $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com", $req->domain);
     }
@@ -26,7 +26,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
         $req->setUpRequest($host, $method, $uri, $filename);
 
-        $this->assertEquals("/test/uri", $req->uri);
+        $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com", $req->domain);
     }
@@ -41,7 +41,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
         $req->setUpRequest($host, $method, $uri, $filename);
 
-        $this->assertEquals("/test/uri", $req->uri);
+        $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com:8080", $req->domain);
     }

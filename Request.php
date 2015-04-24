@@ -46,6 +46,9 @@ class Request
         }
         $scriptName = str_replace(".", "\.", $filename);
         $this->_uri = preg_replace("~^/{$scriptName}~", "", $uri);
+        if ($this->_uri !== "/") {
+            $this->_uri = ltrim($this->_uri, "/");
+        }
 
         if ($host === null) {
             throw new E\RequestException("HTTP_HOST not defined. Review your WebServer configuration", 500);
