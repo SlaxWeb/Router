@@ -10,6 +10,7 @@ class Factory
     {
         $request = new Request;
         $router = new Router($request);
+        Helper::init($router, $request);
 
         return $router;
     }
