@@ -10,20 +10,13 @@ class Router
     protected $_action = null;
     protected $_paramCount = 0;
     protected $_routes = [];
-    protected $_request = [];
+    protected $_request = null;
     protected $_params = [];
     protected $_routed = [];
 
-    public function __construct(array $options)
+    public function __construct(Request $request)
     {
-        if (isset($options["uri"]) === false || $options["uri"] === null) {
-            $options["uri"] = "/";
-        }
-        if (isset($options["method"]) === false || $options["method"] === null) {
-            $options["method"] = "GET";
-        }
-        $this->_request = $options;
-        $this->_prepareUri();
+        $this->_request = $request;
     }
 
     public function defaultRoute()
@@ -99,10 +92,10 @@ class Router
 
     public function process()
     {
-        if (isset($this->_routes[$this->_request["method"]]) === false) {
+        if (isset($this->_routes[$this->_request->method]) === false) {
             $this->_throwNoRouteException($this->_request);
         }
-        $routeData = $this->_routes[$this->_request["method"]];
+        $routeData = $this->_routes[$this->_request->method];
         $action = null;
         $uri = "";
         $route = "";
@@ -110,7 +103,7 @@ class Router
         foreach ($routeData as $r => $a) {
             $matches = null;
             $r = str_replace("/", "\\/", $r);
-            if (in_array(preg_match_all("~^{$r}$~", $this->_request["uri"], $matches), [0, false]) === false) {
+            if (in_array(preg_match_all("~^{$r}$~", $this->_request->uri, $matches), [0, false]) === false) {
                 foreach ($matches as $m) {
                     $params[] = $m[0];
                 }
@@ -142,18 +135,6 @@ class Router
     public function getRouted()
     {
         return $this->_routed;
-    }
-
-    protected function _prepareUri()
-    {
-        $uri = $this->_request["uri"];
-        if (strpos($uri, "/index.php") !== false) {
-            $uri = ltrim($uri, "/index.php") . "/";
-        }
-        if ($uri !== "/") {
-            $uri = ltrim($uri, "/");
-        }
-        $this->_request["uri"] = $uri === "/" ? $uri : rtrim($uri, "/");
     }
 
     protected function _throwNoRouteException($request)
