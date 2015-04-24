@@ -39,10 +39,10 @@ class Request
             }
             $this->_method = $_SERVER["REQUEST_METHOD"];
 
-            if (isset($_SERVER["SERVER_FILENAME"]) === false) {
-                throw new E\RequestException("SERVER_FILENAME not defined. Review your WebServer configuration", 500);
+            if (isset($_SERVER["SCRIPT_FILENAME"]) === false) {
+                throw new E\RequestException("SCRIPT_FILENAME not defined. Review your WebServer configuration", 500);
             }
-            $scriptName = str_replace(".", "\.", basename($_SERVER["SERVER_FILENAME"]));
+            $scriptName = str_replace(".", "\.", basename($_SERVER["SCRIPT_FILENAME"]));
             $this->_uri = preg_replace("~^/{$scriptName}~", "", $_SERVER["REQUEST_URI"]);
         }
 
