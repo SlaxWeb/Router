@@ -6,7 +6,7 @@ use SlaxWeb\Router\Request;
 
 class Factory
 {
-    public function init()
+    public static function init()
     {
         $request = new Request;
         $router = new Router($request);

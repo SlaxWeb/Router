@@ -26,20 +26,29 @@ class Request
 
     protected function _setUp()
     {
+        // check if request is from CLI
+        if (php_sapi_name() === "cli") {
+            $options = getopt();
+            array_shift($options);
+            $this->_uri = implode("/", $options);
+            $this->_method = "CLI";
+        } else {
+            // normal WEB request
+            if (isset($_SERVER["REQUEST_METHOD"]) === false) {
+                throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
+            }
+            $this->_method = $_SERVER["REQUEST_METHOD"];
+
+            if (isset($_SERVER["SERVER_FILENAME"]) === false) {
+                throw new E\RequestException("SERVER_FILENAME not defined. Review your WebServer configuration", 500);
+            }
+            $scriptName = str_replace(".", "\.", basename($_SERVER["SERVER_FILENAME"]));
+            $this->_uri = preg_replace("~^/{$scriptName}~", "", $_SERVER["REQUEST_URI"]);
+        }
+
         if (isset($_SERVER["HTTP_HOST"]) === false) {
             throw new E\RequestException("HTTP_HOST not defined. Review your WebServer configuration", 500);
         }
         $this->_domain = $_SERVER["HTTP_HOST"];
-
-        if (isset($_SERVER["REQUEST_METHOD"]) === false) {
-            throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
-        }
-        $this->_method = $_SERVER["REQUEST_METHOD"];
-
-        if (isset($_SERVER["SERVER_FILENAME"]) === false) {
-            throw new E\RequestException("SERVER_FILENAME not defined. Review your WebServer configuration", 500);
-        }
-        $scriptName = str_replace(".", "\.", basename($_SERVER["SERVER_FILENAME"]));
-        $this->_uri = preg_replace("~^/{$scriptName}~", "", $_SERVER["REQUEST_URI"]);
     }
 }
