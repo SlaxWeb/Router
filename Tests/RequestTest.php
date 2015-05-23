@@ -64,8 +64,8 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
-        $uri = "/test/uri?test=test";
-        $qString = "test=test";
+        $uri = "/test/uri";
+        $qString = "";
         $req = new \SlaxWeb\Router\Request();
 
         $req->setUpRequest($host, $method, $uri, $filename, $qString);
@@ -73,5 +73,10 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com", $req->domain);
+    }
+
+    public function testEmptyQueryString()
+    {
+
     }
 }
