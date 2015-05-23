@@ -31,7 +31,7 @@ class Request
         $this->_domain = "Command Line";
     }
 
-    public function setUpRequest($host, $method, $uri, $filename)
+    public function setUpRequest($host, $method, $uri, $filename, $queryString)
     {
         if ($method === null) {
             throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
@@ -48,6 +48,10 @@ class Request
         $this->_uri = preg_replace("~^/{$scriptName}~", "", $uri);
         if ($this->_uri !== "/") {
             $this->_uri = ltrim($this->_uri, "/");
+        }
+
+        if (($pos = strpos($this->_uri, $queryString)) !== false) {
+            $this->_uri = substr($this->_uri, 0, $pos - 1);
         }
 
         if ($host === null) {
