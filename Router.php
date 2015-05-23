@@ -96,13 +96,13 @@ class Router
         $this->_routed = [
             "uri"       =>  $uri,
             "action"    =>  $action,
-            "params"    =>  $params
+            "params"    =>  $params,
+            "method"    =>  $this->_request->method
         ];
 
         return [
             "action"    =>  $action,
-            "params"    =>  $params,
-            "method"    =>  $this->_request->method
+            "params"    =>  $params
         ];
     }
 
