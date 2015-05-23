@@ -101,7 +101,8 @@ class Router
 
         return [
             "action"    =>  $action,
-            "params"    =>  $params
+            "params"    =>  $params,
+            "method"    =>  $this->_request->method
         ];
     }
 
