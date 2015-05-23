@@ -7,9 +7,10 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri";
+        $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename);
+        $req->setUpRequest($host, $method, $uri, $filename, $qString);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -22,9 +23,10 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test.php/test/uri";
+        $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename);
+        $req->setUpRequest($host, $method, $uri, $filename, $qString);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -37,9 +39,10 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com:8080";
         $uri = "/test/uri";
+        $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename);
+        $req->setUpRequest($host, $method, $uri, $filename, $qString);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -54,5 +57,21 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("CLI", $req->method);
         $this->assertEquals("Command Line", $req->domain);
+    }
+
+    public function testQueryString()
+    {
+        $filename = "test.php";
+        $method = "POST";
+        $host = "www.test.com";
+        $uri = "/test/uri?test=test";
+        $qString = "test=test";
+        $req = new \SlaxWeb\Router\Request();
+
+        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+
+        $this->assertEquals("test/uri", $req->uri);
+        $this->assertEquals("POST", $req->method);
+        $this->assertEquals("www.test.com", $req->domain);
     }
 }
