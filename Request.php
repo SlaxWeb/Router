@@ -50,7 +50,7 @@ class Request
             $this->_uri = ltrim($this->_uri, "/");
         }
 
-        if (($pos = strpos($this->_uri, $queryString)) !== false) {
+        if ($queryString !== "" && ($pos = strpos($this->_uri, $queryString)) !== false) {
             $this->_uri = substr($this->_uri, 0, $pos - 1);
         }
 
