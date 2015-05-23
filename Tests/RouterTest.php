@@ -37,7 +37,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // add three routes and check if the correct one is returned
         $this->setRoutes($router);
 
-        $this->assertEquals(["action" => ["SomeClass", "SomeMethod"], "params" => []], $router->process());
+        $this->assertEquals(["action" => ["SomeClass", "SomeMethod"], "params" => [], "method" => "GET"], $router->process());
 
         // test uri with mandatory parameters
         $this->_counter = 1;
@@ -46,7 +46,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // add three routes and check if the correct one is returned
         $this->setRoutes($router);
 
-        $this->assertEquals(["action" => ["SomeClass", "ParamMethod"], "params" => ["param"]], $router->process());
+        $this->assertEquals(["action" => ["SomeClass", "ParamMethod"], "params" => ["param"], "method" => "GET"], $router->process());
 
         // test uri with optional parameter - missing
         $this->_counter = 2;
@@ -55,7 +55,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // add three routes and check if the correct one is returned
         $this->setRoutes($router);
 
-        $this->assertEquals(["action" => ["SomeClass", "OptionalMethod"], "params" => []], $router->process());
+        $this->assertEquals(["action" => ["SomeClass", "OptionalMethod"], "params" => [], "method" => "GET"], $router->process());
 
         // test uri with optional parameter - present
         $this->_counter = 3;
@@ -64,7 +64,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // add three routes and check if the correct one is returned
         $this->setRoutes($router);
 
-        $this->assertEquals(["action" => ["SomeClass", "OptionalMethod"], "params" => ["param"]], $router->process());
+        $this->assertEquals(["action" => ["SomeClass", "OptionalMethod"], "params" => ["param"], "method" => "GET"], $router->process());
 
         // test uri with optional parameter - present
         $this->_counter = 4;
