@@ -7,7 +7,6 @@ class Router
 {
     protected $_method = "GET";
     protected $_name = "";
-    protected $_action = null;
     protected $_routes = [];
     protected $_request = null;
     protected $_routed = [];
@@ -47,7 +46,6 @@ class Router
 
     public function action($action)
     {
-        $this->_action = $action;
         if ($this->_name === "") {
             throw new E\NoNameException("Route needs a name", 500);
         }
@@ -55,11 +53,10 @@ class Router
             throw new E\InvalidActionException("Action must be callable", 500);
         }
 
-        $this->_routes[$this->_method][$this->_name] = ["action" => $this->_action];
+        $this->_routes[$this->_method][$this->_name] = ["action" => $action];
 
         $this->_method = "GET";
         $this->_name = "";
-        $this->_action = null;
 
         return $this;
     }
