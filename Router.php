@@ -108,6 +108,11 @@ class Router
         return $this->_routed;
     }
 
+    public function getRequest()
+    {
+        return $this->_request;
+    }
+
     protected function _throwNoRouteException($request)
     {
         throw new E\RouteNotFoundException(
