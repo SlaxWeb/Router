@@ -21,7 +21,9 @@ class Factory
                 isset($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : null,
                 isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : null,
                 isset($_SERVER["SCRIPT_FILENAME"]) ? basename($_SERVER["SCRIPT_FILENAME"]) : null,
-                isset($_SERVER["QUERY_STRING"]) ? $_SERVER["QUERY_STRING"] : null
+                isset($_SERVER["QUERY_STRING"]) ? $_SERVER["QUERY_STRING"] : null,
+                (isset($_SERVER["HTTPS"]) && empty($_SERVR["HTTPS"]) === false && $_SERVER["HTTPS"] !== "off")
+                    ? "https" : "http"
             );
         }
 

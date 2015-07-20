@@ -8,6 +8,7 @@ class Request
     protected $_uri = "";
     protected $_domain = "";
     protected $_method = "";
+    protected $_protocol = "";
 
     public function __get($param)
     {
@@ -29,9 +30,10 @@ class Request
         $this->_uri = $uri;
         $this->_method = "CLI";
         $this->_domain = "Command Line";
+        $this->_protocol = "cli";
     }
 
-    public function setUpRequest($host, $method, $uri, $filename, $queryString)
+    public function setUpRequest($host, $method, $uri, $filename, $queryString, $protocol)
     {
         if ($method === null) {
             throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
@@ -58,5 +60,6 @@ class Request
             throw new E\RequestException("HTTP_HOST not defined. Review your WebServer configuration", 500);
         }
         $this->_domain = $host;
+        $this->_protocol = $protocol;
     }
 }
