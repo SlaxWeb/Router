@@ -112,7 +112,7 @@ class Router
     {
         throw new E\RouteNotFoundException(
             "No route could be found for this request",
-            500,
+            404,
             $request
         );
     }
