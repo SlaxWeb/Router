@@ -26,6 +26,7 @@ class Router
      * @var string
      */
     protected $_method = "GET";
+
     /**
      * Route name (URI)
      *
@@ -34,6 +35,7 @@ class Router
      * @var string
      */
     protected $_name = "";
+
     /**
      * Route storage
      *
@@ -42,20 +44,13 @@ class Router
      * @var array
      */
     protected $_routes = [];
+
     /**
      * User request
      *
      * @var \SlaxWeb\Router\Request
      */
     protected $_request = null;
-    /**
-     * Routed request
-     *
-     * When a request is successfuly routed, data is stored in this property
-     *
-     * @var array
-     */
-    protected $_routed = [];
 
     /**
      * Class constructor
@@ -176,8 +171,7 @@ class Router
      * the current request. When a first match occures, the loop is broken
      * and the first matchin route is used. HTTP method and request URI
      * have to match for the route to match the request. Once a match is found
-     * it is stored in the '_routed' property, and the action and parameters
-     * are returned as an array.
+     * the action and parameters are returned as an array.
      *
      * If the request does not match any stored routes and Exception is thrown.
      *
@@ -191,7 +185,6 @@ class Router
         }
         $routeData = $this->_routes[$this->_request->method];
         $action = null;
-        $uri = "";
         $params = "";
         foreach ($routeData as $r => $a) {
             $matches = null;
@@ -201,8 +194,8 @@ class Router
                     $params[] = $m[0];
                 }
                 $action = $a["action"];
-                $uri = array_shift($params);
                 $params = array_filter($params);
+                array_shift($params);
                 break;
             }
         }
@@ -210,13 +203,6 @@ class Router
         if ($action === null) {
             $this->_throwNoRouteException($this->_request);
         }
-
-        $this->_routed = [
-            "uri"       =>  $uri,
-            "action"    =>  $action,
-            "params"    =>  $params,
-            "method"    =>  $this->_request->method
-        ];
 
         return [
             "action"    =>  $action,
