@@ -33,7 +33,7 @@ class Request
         $this->_protocol = "cli";
     }
 
-    public function setUpRequest($host, $method, $uri, $filename, $queryString, $protocol)
+    public function setUpRequest($host, $method, $uri, $filename, $queryString, $protocol = "http")
     {
         if ($method === null) {
             throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
