@@ -5,7 +5,7 @@ use \SlaxWeb\Router\Request;
 
 class RouteNotFoundException extends \Exception
 {
-    protected $_request = [];
+    protected $_request = null;
 
     public function __construct($message = "", $code = 0, Request $request = null, \Exception $previous = null)
     {
@@ -16,5 +16,10 @@ class RouteNotFoundException extends \Exception
     public function __toString()
     {
         return __CLASS__ . ": [{$this->code}]: {$this->message}\nREQUEST: {$this->_request}\n";
+    }
+
+    public function getRequest()
+    {
+        return $this->_request;
     }
 }
