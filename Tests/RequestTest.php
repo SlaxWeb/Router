@@ -3,7 +3,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
 {
     public function testSetup()
     {
-        $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri";
@@ -20,9 +19,26 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $this->assertEquals("http", $req->protocol);
     }
 
+    public function testEmptyUri()
+    {
+        $method = "POST";
+        $host = "www.test.com";
+        $uri = "/";
+        $scriptName = "/test.php";
+        $req = new \SlaxWeb\Router\Request();
+
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
+
+        $this->assertEquals("", $req->dir);
+        $this->assertEquals("/", $req->uri);
+        $this->assertEquals("POST", $req->method);
+        $this->assertEquals("www.test.com", $req->domain);
+        $this->assertEquals("http", $req->protocol);
+    }
+
     public function testScriptNameRemoved()
     {
-        $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test.php/test/uri";
@@ -39,7 +55,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     public function testPortRetained()
     {
-        $filename = "test.php";
         $method = "POST";
         $host = "www.test.com:8080";
         $uri = "/test/uri";
@@ -66,7 +81,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     public function testQueryString()
     {
-        $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri?test=test";
@@ -85,7 +99,6 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
     public function testSubDir()
     {
-        $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/subdir/test/uri";

@@ -75,7 +75,7 @@ class Request
 
         parse_str($_SERVER["QUERY_STRING"], $_GET);
 
-        $this->_uri = $requestUri !== "/" && $requestUri !== ""
+        $this->_uri = in_array($requestUri, ["", "/", false]) === false
             ? $this->_sanitizeUri($requestUri)
             : "/";
 
