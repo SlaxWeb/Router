@@ -79,6 +79,6 @@ class Request
         parse_str($_SERVER["QUERY_STRING"], $_GET);
 
         $this->_uri = $requestUri !== "/" ? ltrim($requestUri, "/") : $requestUri;
-        $this->_dir = dirname($scriptName);
+        $this->_dir = ltrim(dirname($scriptName), "/");
     }
 }
