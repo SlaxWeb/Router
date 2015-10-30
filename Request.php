@@ -59,9 +59,6 @@ class Request
         } elseif (strpos($requestUri, dirname($scriptName)) === 0) {
             $requestUri = substr($requestUri, strlen(dirname($scriptName)));
         }
-        if ($requestUri === false) {
-            $requestUri = "/";
-        }
 
         /*
          * ensure that a correct URI is found on servers that require it
@@ -78,7 +75,9 @@ class Request
 
         parse_str($_SERVER["QUERY_STRING"], $_GET);
 
-        $this->_uri = $requestUri !== "/" ? ltrim($requestUri, "/") : $requestUri;
+        $this->_uri = $requestUri !== "/" && $requestUri !== ""
+            ? $this->_sanitizeUri($requestUri)
+            : "/";
 
         // parse the directory
         $this->_dir = dirname($scriptName);
@@ -86,5 +85,19 @@ class Request
         if ($this->_dir === "/") {
             $this->_dir = "";
         }
+    }
+
+    protected function _sanitizeUri($uri)
+    {
+        $uriParts = [];
+        $tok = strtok($uri, "/");
+        while ($tok !== false) {
+            if ((empty($tok) === false || $tok === "0") && $tok !== "..") {
+                $uriParts[] = $tok;
+            }
+            $tok = strtok("/");
+        }
+
+        return implode("/", $uriParts);
     }
 }
