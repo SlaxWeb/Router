@@ -79,6 +79,12 @@ class Request
         parse_str($_SERVER["QUERY_STRING"], $_GET);
 
         $this->_uri = $requestUri !== "/" ? ltrim($requestUri, "/") : $requestUri;
+
+        // parse the directory
         $this->_dir = dirname($scriptName);
+        // if there is no subdir, just set the property to an empty string
+        if ($this->_dir === "/") {
+            $this->_dir = "";
+        }
     }
 }

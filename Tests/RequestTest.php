@@ -13,6 +13,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $req->setBaseRequest("http", $host, $method);
         $req->parseRequestUri($uri, $scriptName);
 
+        $this->assertEquals("", $req->dir);
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com", $req->domain);
