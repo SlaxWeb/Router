@@ -59,10 +59,14 @@ class Request
         } elseif (strpos($requestUri, dirname($scriptName)) === 0) {
             $requestUri = substr($requestUri, strlen(dirname($scriptName)));
         }
+        if ($requestUri === false) {
+            $requestUri = "/";
+        }
 
         /*
-         * ensure that a correct URI is found in the query string,
-         * and fix the QUERY_STRING server var and $_GET array
+         * ensure that a correct URI is found on servers that require it
+         * in the query string, and fix the QUERY_STRING server var and
+         * $_GET array
          */
         if (trim($requestUri, "/") === "" && strncmp($queryString, "/", 1) === 0) {
             $queryString = explode("?", $queryString, 2);
