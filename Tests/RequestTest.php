@@ -7,10 +7,12 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri";
+        $scriptName = "/test.php";
         $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -24,10 +26,12 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test.php/test/uri";
+        $scriptName = "/test.php";
         $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -40,10 +44,12 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com:8080";
         $uri = "/test/uri";
+        $scriptName = "/test.php";
         $qString = null;
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -66,10 +72,12 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri";
+        $scriptName = "/test.php";
         $qString = "";
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
