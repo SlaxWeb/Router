@@ -5,6 +5,7 @@ use SlaxWeb\Router\Exceptions as E;
 
 class Request
 {
+    protected $_dir = "";
     protected $_uri = "";
     protected $_domain = "";
     protected $_method = "";
@@ -33,33 +34,51 @@ class Request
         $this->_protocol = "cli";
     }
 
-    public function setUpRequest($host, $method, $uri, $filename, $queryString, $protocol = "http")
+    public function setBaseRequest($protocol, $host, $method)
     {
         if ($method === null) {
             throw new E\RequestException("REQUEST_METHOD not defined. Review your WebServer configuration", 500);
         }
-        $this->_method = $method;
-
-        if ($filename === null) {
-            throw new E\RequestException("SCRIPT_FILENAME not defined. Review your WebServer configuration", 500);
-        }
-        if ($uri === null) {
-            throw new E\RequestException("REQUEST_URI not defined. Review your WebServer configuration", 500);
-        }
-        $scriptName = str_replace(".", "\.", $filename);
-        $this->_uri = preg_replace("~^/{$scriptName}~", "", $uri);
-        if ($this->_uri !== "/") {
-            $this->_uri = ltrim($this->_uri, "/");
-        }
-
-        if ($queryString !== "" && ($pos = strpos($this->_uri, $queryString)) !== false) {
-            $this->_uri = substr($this->_uri, 0, $pos - 1);
-        }
-
         if ($host === null) {
             throw new E\RequestException("HTTP_HOST not defined. Review your WebServer configuration", 500);
         }
-        $this->_domain = $host;
+
         $this->_protocol = $protocol;
+        $this->_domain = $host;
+        $this->_method = $method;
+    }
+
+    public function parseRequestUri($requestUri, $scriptName)
+    {
+        $requestUri = parse_url("{$this->_protocol}://{$this->domain}{$requestUri}");
+        $queryString = isset($requestUri["query"]) ? $requestUri["query"] : "";
+        $requestUri = isset($requestUri["path"]) ? $requestUri["path"] : "";
+
+        if (strpos($requestUri, $scriptName) === 0) {
+            $requestUri = substr($requestUri, strlen($scriptName));
+        } elseif (strpos($requestUri, dirname($scriptName)) === 0) {
+            $requestUri = substr($requestUri, strlen(dirname($scriptName)));
+        }
+        if ($requestUri === false) {
+            $requestUri = "/";
+        }
+
+        /*
+         * ensure that a correct URI is found on servers that require it
+         * in the query string, and fix the QUERY_STRING server var and
+         * $_GET array
+         */
+        if (trim($requestUri, "/") === "" && strncmp($queryString, "/", 1) === 0) {
+            $queryString = explode("?", $queryString, 2);
+            $requestUri = $queryString[0];
+            $_SERVER["QUERY_STRING"] = isset($queryString[1]) ? $queryString[1] : "";
+        } else {
+            $_SERVER["QUERY_STRING"] = $queryString;
+        }
+
+        parse_str($_SERVER["QUERY_STRING"], $_GET);
+
+        $this->_uri = $requestUri !== "/" ? ltrim($requestUri, "/") : $requestUri;
+        $this->_dir = ltrim(dirname($scriptName), "/");
     }
 }

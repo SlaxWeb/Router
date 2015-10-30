@@ -7,10 +7,11 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test/uri";
-        $qString = null;
+        $scriptName = "/test.php";
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -24,10 +25,11 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com";
         $uri = "/test.php/test/uri";
-        $qString = null;
+        $scriptName = "/test.php";
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -40,10 +42,11 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $method = "POST";
         $host = "www.test.com:8080";
         $uri = "/test/uri";
-        $qString = null;
+        $scriptName = "/test.php";
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
@@ -65,19 +68,35 @@ class RequestTest extends PHPUnit_Framework_TestCase
         $filename = "test.php";
         $method = "POST";
         $host = "www.test.com";
-        $uri = "/test/uri";
-        $qString = "";
+        $uri = "/test/uri?test=test";
+        $scriptName = "/test.php";
         $req = new \SlaxWeb\Router\Request();
 
-        $req->setUpRequest($host, $method, $uri, $filename, $qString);
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
 
         $this->assertEquals("test/uri", $req->uri);
         $this->assertEquals("POST", $req->method);
         $this->assertEquals("www.test.com", $req->domain);
+        $this->assertArrayHasKey("test", $_GET);
+        $this->assertEquals("test", $_GET["test"]);
     }
 
-    public function testEmptyQueryString()
+    public function testSubDir()
     {
+        $filename = "test.php";
+        $method = "POST";
+        $host = "www.test.com";
+        $uri = "/test/subdir/test/uri";
+        $scriptName = "/test/subdir/test.php";
+        $req = new \SlaxWeb\Router\Request();
 
+        $req->setBaseRequest("http", $host, $method);
+        $req->parseRequestUri($uri, $scriptName);
+
+        $this->assertEquals("test/subdir", $req->dir);
+        $this->assertEquals("test/uri", $req->uri);
+        $this->assertEquals("POST", $req->method);
+        $this->assertEquals("www.test.com", $req->domain);
     }
 }
