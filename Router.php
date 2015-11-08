@@ -83,11 +83,8 @@ class Router
             $this->_method = strtoupper($method);
             return $this;
         }
-        if (method_exists($this, $method)) {
-            return $this->{$method}(...$params);
-        }
 
-        throw new \Exception("Method not found in \\SlaxWeb\\Router\\Router", 500);
+        throw new \Exception("Requested method '{$method}' not found.", 500);
     }
 
     /**
