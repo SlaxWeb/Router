@@ -17,7 +17,7 @@ class Factory
             $request->setUpCLI($options["uri"]);
         } else {
             $request->setBaseRequest(
-                (isset($_SERVER["HTTPS"]) && empty($_SERVR["HTTPS"]) === false && $_SERVER["HTTPS"] !== "off")
+                (isset($_SERVER["HTTPS"]) && empty($_SERVER["HTTPS"]) === false && $_SERVER["HTTPS"] !== "off")
                     ? "https" : "http",
                 isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : null,
                 isset($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : null
