@@ -18,7 +18,7 @@ class RouterTest extends PHPUnit_Framework_TestCase
         // non existing methods must raise an exception
         $this->assertEquals($router, $router->get());
         $this->assertEquals($router, $router->defaultRoute());
-        $this->setExpectedException("\\Exception", "Method not found in \\SlaxWeb\\Router\\Router");
+        $this->setExpectedException("\\Exception", "Requested method 'unknownMethod' not found.");
         $router->unknownMethod();
     }
 
