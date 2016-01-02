@@ -2,7 +2,7 @@
     "name": "slaxweb/router",
     "description": "Router library for SlaxWeb Framework",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "authors": [
         {
             "name": "Tomaz Lovrec",
@@ -22,7 +22,7 @@
 	},
     "extra": {
         "branch-alias": {
-            "dev-develop": "0.2.x-dev"
+            "dev-develop": "0.3.x-dev"
         }
     },
     "target-dir": "SlaxWeb/Router"
