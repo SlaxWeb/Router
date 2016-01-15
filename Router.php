@@ -52,6 +52,13 @@ class Router
      */
     protected $_request = null;
 
+	/**
+	 * Response component
+	 *
+	 * @var \SlaxWeb\Router\Response
+	 */
+	protected $_response = null;
+
     /**
      * Class constructor
      *
@@ -59,9 +66,10 @@ class Router
      *
      * @param $request \SlaxWeb\Router\Request User request
      */
-    public function __construct(Request $request)
+    public function __construct(Request $request, Response $response)
     {
         $this->_request = $request;
+		$this->_response = $response;
     }
 
     /**
