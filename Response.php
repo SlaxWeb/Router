@@ -37,6 +37,16 @@ class Response
      */
     protected $_logger = null;
 
+    /***********************
+     * Settings properties *
+     ***********************/
+    /**
+     * Forbid output
+     *
+     * @var bool
+     */
+    protected $_forbidOutput = true;
+
     /*
      * Header constants
      */
@@ -77,10 +87,18 @@ class Response
         );
         $this->_log("debug", "Body output", ["output" => $this->_body]);
         http_response_code($this->_status);
+        if ($this->_forbidOutput === true) {
+            $output = ob_get_contents();
+            ob_end_clean();
+            if (empty($output) === false) {
+                $this->_log("error", "Output was detected, but suppressed.");
+                $this->_log("debug", "Suppressed output.", ["output" => $output]);
+            }
+        } else {
+            ob_end_flush();
+            flush();
+        }
         echo $this->_body;
-        ob_end_flush();
-        ob_flush();
-        flush();
     }
 
     /**
