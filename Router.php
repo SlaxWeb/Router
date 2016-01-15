@@ -7,7 +7,7 @@
  *
  * @author Tomaz Lovrec <tomaz.lovrec@gmail.com>
  * @package \SlaxWeb\Router
- * @version v1.0
+ * @version v0.3
  * @license MIT
  *
  * @copyright (c) 2015 Tomaz Lovrec
