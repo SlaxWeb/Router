@@ -86,7 +86,6 @@ class Response
             "Class is destructing. Set response code ({$this->_status}), output the body, and flush buffers."
         );
         $this->_log("debug", "Body output", ["output" => $this->_body]);
-        http_response_code($this->_status);
         if ($this->_forbidOutput === true) {
             $output = ob_get_contents();
             ob_end_clean();
@@ -98,6 +97,7 @@ class Response
             ob_end_flush();
             flush();
         }
+        http_response_code($this->_status);
         echo $this->_body;
     }
 
