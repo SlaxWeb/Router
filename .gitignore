@@ -4,3 +4,4 @@
 **.session.vim
 composer.lock
 vendor/
+.tags
