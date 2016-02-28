@@ -1,8 +1,8 @@
 {
     "name": "slaxweb/router",
-    "description": "Router library for SlaxWeb Framework",
+    "description": "Router component for the SlaxWeb/Framework",
     "license": "MIT",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "authors": [
         {
             "name": "Tomaz Lovrec",
@@ -10,20 +10,28 @@
         }
     ],
     "require": {
-		"php":	">=5.4.0"
+		"php":">=7.0.0",
+        "slaxweb/hooks": "0.4.*@dev",
+        "slaxweb/logger": "0.2.*@dev",
+        "slaxweb/config": "0.1.*@dev",
+        "symfony/http-foundation": "~3.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.6"
+        "codeception/codeception": "~2.1",
+        "behat/gherkin": "~4.4"
+    },
+    "suggest": {
+        "pimple/pimple": "Make use of available providers for Pimple version 3.0.x"
     },
 	"autoload":	{
-		"psr-0": {
-			"SlaxWeb\\Router": ""
+		"psr-4": {
+			"SlaxWeb\\Router\\": "src/",
+            "SlaxWeb\\Router\\Tests\\Unit\\": "tests/unit/"
 		}
 	},
     "extra": {
         "branch-alias": {
             "dev-develop": "0.3.x-dev"
         }
-    },
-    "target-dir": "SlaxWeb/Router"
+    }
 }
