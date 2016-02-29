@@ -17,7 +17,7 @@
         "symfony/http-foundation": "~3.0"
     },
     "require-dev": {
-        "codeception/codeception": "~2.1",
+        "codeception/codeception": "dev-master",
         "behat/gherkin": "~4.4"
     },
     "suggest": {
