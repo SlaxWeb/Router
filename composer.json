@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "codeception/codeception": "dev-master",
+        "mockery/mockery": "~0.9",
         "behat/gherkin": "~4.4"
     },
     "suggest": {
