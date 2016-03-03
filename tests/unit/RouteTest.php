@@ -14,7 +14,6 @@
  */
 namespace SlaxWeb\Router\Tests\Unit;
 
-use Mockery as m;
 use SlaxWeb\Router\Route;
 
 class RouteTest extends \Codeception\Test\Unit
