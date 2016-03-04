@@ -79,21 +79,19 @@ class Route
      * @param callable $action Route action
      * @return self
      */
-    public function set(string $uri, string $method, callable $action): self
+    public function set(string $uri, string $method, callable $action)
     {
-        if (
-            in_array(
-                $method,
-                [
-                    self::METHOD_GET,
-                    self::METHOD_POST,
-                    self::METHOD_PUT,
-                    self::METHOD_DELETE,
-                    self::METHOD_CLI,
-                    self::METHOD_ANY
-                ]
-            ) === false
-        ) {
+        if (in_array(
+            $method,
+            [
+                self::METHOD_GET,
+                self::METHOD_POST,
+                self::METHOD_PUT,
+                self::METHOD_DELETE,
+                self::METHOD_CLI,
+                self::METHOD_ANY
+            ]
+        ) === false) {
             throw new Exception\InvalidMethodException(
                 "Route HTTP Method '{$method}' is not valid."
             );
