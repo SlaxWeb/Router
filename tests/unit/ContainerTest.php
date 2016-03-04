@@ -55,7 +55,7 @@ class ContainerTest extends \Codeception\Test\Unit
     {
         $this->_container = new Container;
 
-        $this->_route = m::mock("\\SlaxWeb\\Router\\Container");
+        $this->_route = m::mock("\\SlaxWeb\\Router\\Route")->makePartial();
         $this->_route->uri = "";
         $this->_route->method = "";
         $this->_route->action = null;
@@ -75,21 +75,27 @@ class ContainerTest extends \Codeception\Test\Unit
      */
     public function testOnlyValidRouteAccepted()
     {
-        $this->specify("Route not correct type", function () {
+        $exception = false;
+        try {
             $this->_container->add(new \stdClass);
-        }, ["throws" => "TypeError"]);
+        } catch (\TypeError $e) {
+            $exception = true;
+        }
+        if ($exception === false) {
+            throw new \Exception("'TypeError' was expected but was not thrown");
+        }
 
         $route = clone $this->_route;
 
         $this->specify(
             "Route definition incomplete",
-            function () {
+            function () use ($route) {
                 $this->_container->add($route);
             },
             ["throws" => "SlaxWeb\\Router\\Exception\\RouteIncompleteException"]
         );
 
-        $this->specify("Valid Route", function () {
+        $this->specify("Valid Route", function () use ($route) {
             $route->uri = "~^uri$~";
             $route->method = "GET";
             $route->action = function () {
@@ -103,8 +109,9 @@ class ContainerTest extends \Codeception\Test\Unit
      * Test Route retrieval
      *
      * Ensure that all inserted Route definitions can be retrieved, as an array,
-     * as well as that the internal array can be traversed with 'next' and
-     * 'prev' methods.
+     * as well as that individual Route definitions can be obtained with 'next'
+     * and 'prev' methods. If 'next' is called for the first time, then the
+     * first Route is returned, and the same applies for 'prev'.
      *
      * @return void
      * @depends testOnlyValidRouteAccepted
@@ -130,5 +137,49 @@ class ContainerTest extends \Codeception\Test\Unit
                 $this->assertRegExp($route->uri, "uri{$count}");
             }
         });
+
+        $this->specify(
+            "'next' returns first Route on first call",
+            function () {
+                $route = $this->_containter->next();
+                $this->assertEquals(0, call_user_func($route->action));
+                $this->assertEquals("GET", $route->method);
+                $this->assertRegExp($route->uri, "uri1");
+            }
+        );
+
+        $this->specify(
+            "'prev' returns last Route on first call",
+            function () {
+                $route = $this->_containter->prev();
+                $this->assertEquals(2, call_user_func($route->action));
+                $this->assertEquals("GET", $route->method);
+                $this->assertRegExp($route->uri, "uri3");
+            }
+        );
+
+        $this->specify(
+            "Itteration with 'next' possible",
+            function () {
+                $count = 0;
+                while ($this->_container->next()) {
+                    $this->assertEquals($count++, call_user_func($route->action));
+                    $this->assertEquals("GET", $route->method);
+                    $this->assertRegExp($route->uri, "uri{$count}");
+                }
+            }
+        );
+
+        $this->specify(
+            "Itteration with 'prev' possible",
+            function () {
+                $count = 3;
+                while ($this->_container->prev()) {
+                    $this->assertRegExp($route->uri, "uri" . $count--);
+                    $this->assertEquals("GET", $route->method);
+                    $this->assertEquals($count, call_user_func($route->action));
+                }
+            }
+        );
     }
 }
