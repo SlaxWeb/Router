@@ -77,9 +77,9 @@ class Route
      * @param string $uri Request URI regex without delimiter
      * @param string $method HTTP Request Method, accepts METHODO_* constant
      * @param callable $action Route action
-     * @return void
+     * @return self
      */
-    public function set(string $uri, string $method, callable $action)
+    public function set(string $uri, string $method, callable $action): self
     {
         if (
             in_array(
@@ -102,6 +102,8 @@ class Route
         $this->_uri = "~^{$uri}$~";
         $this->_method = $method;
         $this->_action = $action;
+
+        return $this;
     }
 
     /**
