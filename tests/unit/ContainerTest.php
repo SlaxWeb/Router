@@ -141,7 +141,7 @@ class ContainerTest extends \Codeception\Test\Unit
         $this->specify(
             "'next' returns first Route on first call",
             function () {
-                $route = $this->_containter->next();
+                $route = $this->_container->next();
                 $this->assertEquals(0, call_user_func($route->action));
                 $this->assertEquals("GET", $route->method);
                 $this->assertRegExp($route->uri, "uri1");
@@ -151,10 +151,10 @@ class ContainerTest extends \Codeception\Test\Unit
         $this->specify(
             "'prev' returns last Route on first call",
             function () {
-                $route = $this->_containter->prev();
-                $this->assertEquals(2, call_user_func($route->action));
+                $route = $this->_container->prev();
+                $this->assertEquals(4, call_user_func($route->action));
                 $this->assertEquals("GET", $route->method);
-                $this->assertRegExp($route->uri, "uri3");
+                $this->assertRegExp($route->uri, "uri5");
             }
         );
 
@@ -162,7 +162,7 @@ class ContainerTest extends \Codeception\Test\Unit
             "Itteration with 'next' possible",
             function () {
                 $count = 0;
-                while ($this->_container->next()) {
+                while ($route = $this->_container->next()) {
                     $this->assertEquals($count++, call_user_func($route->action));
                     $this->assertEquals("GET", $route->method);
                     $this->assertRegExp($route->uri, "uri{$count}");
@@ -173,8 +173,8 @@ class ContainerTest extends \Codeception\Test\Unit
         $this->specify(
             "Itteration with 'prev' possible",
             function () {
-                $count = 3;
-                while ($this->_container->prev()) {
+                $count = 5;
+                while ($route = $this->_container->prev()) {
                     $this->assertRegExp($route->uri, "uri" . $count--);
                     $this->assertEquals("GET", $route->method);
                     $this->assertEquals($count, call_user_func($route->action));
