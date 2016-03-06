@@ -20,14 +20,9 @@ use Mockery as m;
 use SlaxWeb\Router\Route;
 use SlaxWeb\Router\Container;
 
-class ContainerTest extends \Codeception\Test\Unit
+class ContainerTest extends \PHPUnit_Framework_TestCase
 {
     use \Codeception\Specify;
-
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
 
     /**
      * Container
@@ -51,7 +46,7 @@ class ContainerTest extends \Codeception\Test\Unit
      *
      * @return void
      */
-    protected function _before()
+    protected function setUp()
     {
         $this->_container = new Container;
 
@@ -61,7 +56,7 @@ class ContainerTest extends \Codeception\Test\Unit
         $this->_route->action = null;
     }
 
-    protected function _after()
+    protected function tearDown()
     {
     }
 

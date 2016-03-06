@@ -16,14 +16,9 @@ namespace SlaxWeb\Router\Tests\Unit;
 
 use SlaxWeb\Router\Route;
 
-class RouteTest extends \Codeception\Test\Unit
+class RouteTest extends \PHPUnit_Framework_TestCase
 {
     use \Codeception\Specify;
-
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
 
     /**
      * Route
@@ -39,12 +34,12 @@ class RouteTest extends \Codeception\Test\Unit
      *
      * @return void
      */
-    protected function _before()
+    protected function setUp()
     {
         $this->_route = new Route;
     }
 
-    protected function _after()
+    protected function tearDown()
     {
     }
 

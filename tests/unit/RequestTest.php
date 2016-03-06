@@ -15,20 +15,15 @@
  */
 namespace SlaxWeb\Router\Tests\Unit;
 
-class RequestTest extends \Codeception\Test\Unit
+class RequestTest extends \PHPUnit_Framework_TestCase
 {
     use \Codeception\Specify;
 
-    /**
-     * @var \UnitTester
-     */
-    protected $tester;
-
-    protected function _before()
+    protected function setUp()
     {
     }
 
-    protected function _after()
+    protected function tearDown()
     {
     }
 
