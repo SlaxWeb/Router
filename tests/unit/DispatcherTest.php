@@ -17,8 +17,40 @@ namespace SlaxWeb\Router\Tests\Unit;
 
 class DispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * Routes Container
+     *
+     * @var \SlaxWeb\Router\Container
+     */
+    protected $_container = null;
+
+    /**
+     * Hooks Container
+     *
+     * @var \SlaxWeb\Hooks\Container
+     */
+    protected $_hooks = null;
+
+    /**
+     * Logger
+     *
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $_logger = null;
+
+    /**
+     * Prepare the test
+     *
+     * Instantiate the Routes Container, the Hooks Container, and the Logger
+     * mock objects.
+     *
+     * @return void
+     */
     protected function setUp()
     {
+        $this->_container = $this->_getMock("\\SlaxWeb\\Router\\Container");
+        $this->_hooks = $this->_getMock("\\SlaxWeb\\Hooks\\Container");
+        $this->_logger = $this->getMock("\\Psr\\Log\\LoggerInterface");
     }
 
     protected function tearDown()
