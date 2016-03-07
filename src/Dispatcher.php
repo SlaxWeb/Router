@@ -86,21 +86,41 @@ class Dispatcher
             array_slice(func_get_args(), 2)
         );
 
+        if (
+            ($route = $this->_findRoute($requestMethod, $requestUri)) !== null
+        ) {
+            call_user_func_array($route->action, $params);
+        }
+    }
+
+    /**
+     * Find matching Route
+     *
+     * Find the matching Route based on the Request Method and Request URI. If
+     * no matching route is found, null is returned. Otherwise the matching
+     * Route object is returned.
+     *
+     * @param string $method Request Method
+     * @param string $uri Request Uri
+     * @return \SlaxWeb\Router\Route|null
+     */
+    protected function _findRoute(string $method, string $uri): Route
+    {
         while (($route = $this->_routes->next()) !== false) {
-            if ($requestMethod !== $route->method) {
+            if ($method !== $route->method) {
                 continue;
             }
 
-            $uriMatch = preg_match($route->uri, $requestUri);
+            $uriMatch = preg_match($route->uri, $uri);
             if ($uriMatch === 0) {
                 continue;
             } elseif ($uriMatch === false) {
                 // throw error
             }
 
-            call_user_func_array($route->action, $params);
-
-            break;
+            return $route;
         }
+
+        return null;
     }
 }
