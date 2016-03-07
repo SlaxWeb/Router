@@ -61,6 +61,8 @@ class Dispatcher
         $this->_logger = $logger;
 
         $this->_logger->info("Router Dispatcher initialized");
+
+        $this->_hooks->exec("router.dispatcher.afterInit");
     }
 
     /**
@@ -88,7 +90,16 @@ class Dispatcher
 
         $route = $this->_findRoute($requestMethod, $requestUri);
         if ($route !== null) {
-            call_user_func_array($route->action, $params);
+            $result = $this->_hooks->exec(
+                "router.dispatcher.beforeDispatch",
+                $route
+            );
+            if ($result === false
+                || (is_array($result) && in_array(false, $result))) {
+                return;
+            }
+            ($route->action)(...$params);
+            $this->_hooks->exec("router.dispatcher.afterDispatch");
         }
     }
 
@@ -117,6 +128,7 @@ class Dispatcher
                 // throw error
             }
 
+            $this->_hooks->exec("router.dispatcher.routeFound", $route);
             return $route;
         }
 

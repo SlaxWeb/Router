@@ -80,6 +80,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->_logger->expects($this->once())
             ->method("info");
 
+        $this->_hooks->expects($this->once())
+            ->method("exec")
+            ->with("router.dispatcher.afterInit");
+
         new Dispatcher($this->_container, $this->_hooks, $this->_logger);
     }
 
@@ -99,6 +103,16 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->method("next")
             ->will(
                 $this->onConsecutiveCalls($routes[0], $routes[1], $routes[2])
+            );
+
+        // prepare hooks
+        $this->_hooks->expects($this->exactly(4))
+            ->method("exec")
+            ->withConsecutive(
+                ["router.dispatcher.afterInit"],
+                ["router.dispatcher.routeFound", $routes[2]],
+                ["router.dispatcher.beforeDispatch", $routes[2]],
+                ["router.dispatcher.afterDispatch"]
             );
 
         // init the dispatcher
@@ -132,6 +146,20 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
 
         $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
+     * Test dispatcher hooks
+     *
+     * Test that the dispatcher calls all the hooks it needs to, and that the
+     * dispatcher stops further execution of the Route if the 'bedoreDispatch'
+     * returns bool(false) or an array containing a bool(false) value.
+     *
+     * @return void
+     */
+    public function testDispatcherHooks()
+    {
+
     }
 
     /**
