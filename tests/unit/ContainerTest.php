@@ -39,6 +39,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     protected $_route = null;
 
     /**
+     * Logger Mock
+     *
+     * @var mocked object
+     */
+    protected $_logger = null;
+
+    /**
      * Prepare test
      *
      * Prepare a fresch container object for every test as well as a fresh Route
@@ -48,9 +55,17 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_container = new Container;
+        $this->_logger = $this->getMock("\\Psr\\Log\\LoggerInterface");
 
+        $this->_container = new Container($this->_logger);
+
+<<<<<<< Updated upstream
         $this->_route = m::mock("\\SlaxWeb\\Router\\Route")->makePartial();
+=======
+        $this->_route = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+            ->setMethods(null)
+            ->getMock();
+>>>>>>> Stashed changes
         $this->_route->uri = "";
         $this->_route->method = "";
         $this->_route->action = null;
@@ -82,21 +97,31 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
         $route = clone $this->_route;
 
+        $logger = clone $this->_logger;
+        $logger->expects($this->once())
+            ->method("error");
+        $logger->expects($this->once())
+            ->method("debug");
+        $container = clone $this->_container;
         $this->specify(
             "Route definition incomplete",
-            function () use ($route) {
-                $this->_container->add($route);
+            function () use ($route, $container) {
+                $container->add($route);
             },
             ["throws" => "SlaxWeb\\Router\\Exception\\RouteIncompleteException"]
         );
 
-        $this->specify("Valid Route", function () use ($route) {
+        $logger = clone $this->_logger;
+        $logger->expects($this->once())
+            ->method("info");
+        $container = clone $this->_container;
+        $this->specify("Valid Route", function () use ($route, $container) {
             $route->uri = "~^uri$~";
             $route->method = "GET";
             $route->action = function () {
                 return true;
             };
-            $this->_container->add($route);
+            $container->add($route);
         });
     }
 
