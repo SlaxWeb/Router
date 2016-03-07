@@ -16,7 +16,6 @@
  */
 namespace SlaxWeb\Router\Tests\Unit;
 
-use Mockery as m;
 use SlaxWeb\Router\Route;
 use SlaxWeb\Router\Container;
 
@@ -50,7 +49,9 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $this->_container = new Container;
 
-        $this->_route = m::mock("\\SlaxWeb\\Router\\Route")->makePartial();
+        $this->_route = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+            ->setMethods(null)
+            ->getMock();;
         $this->_route->uri = "";
         $this->_route->method = "";
         $this->_route->action = null;
