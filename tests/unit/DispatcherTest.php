@@ -15,6 +15,8 @@
  */
 namespace SlaxWeb\Router\Tests\Unit;
 
+use SlaxWeb\Router\Dispatcher;
+
 class DispatcherTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -55,5 +57,22 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+    }
+
+    /**
+     * Test constructor
+     *
+     * Ensure that the constructor takes the Routes Container, the Hooks
+     * Container, and the Logger as input parameters, and that it logs about
+     * Dispatcher initialization in the INFO log level.
+     *
+     * @return void
+     */
+    public function testConstructor()
+    {
+        $this->_logger->expects($this->once())
+            ->method("info");
+
+        new Dispatcher($this->_container, $this->_hooks, $this->_logger);
     }
 }
