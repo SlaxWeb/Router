@@ -82,4 +82,81 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         new Dispatcher($this->_container, $this->_hooks, $this->_logger);
     }
+
+    /**
+     * Test Route Execution
+     *
+     * Test that the Dispatcher finds the correct Route based on the Request
+     * object, and properly executes the Route callable.
+     *
+     * @return void
+     */
+    public function testRouteExecution()
+    {
+        $routes = $this->_prepareRoutes();
+
+        $this->_container->expects($this->exactly(3))
+            ->method("next")
+            ->will(
+                $this->onConsecutiveCalls($routes[0], $routes[1], $routes[2])
+            );
+
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        $request = $this->getMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->once())
+            ->method("getMethod")
+            ->willReturn("PUT");
+
+        $request->expects($this->once())
+            ->method("getPathInfo")
+            ->willReturn("/uri3");
+
+        $response = $this->getMock(
+            "\\Symfony\\Component\\HttpFoundation\\Response"
+        );
+
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("PUT", 2);
+
+
+        $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
+     * Prepare routes
+     *
+     * Prepare some fake routes for tests.
+     *
+     * @return array
+     */
+    protected function _prepareRoutes()
+    {
+        $routeMock = $this->getMock("\\SlaxWeb\\Router\\Route");
+        $routes = [];
+        $methods = ["GET", "POST", "PUT", "DELETE", "CLI", "ANY"];
+        for ($count = 0; $count < 6; $count++) {
+            $route = clone $routeMock;
+            $route->uri = "~^uri" . ($count + 1) . "$~";
+            $route->method = $methods[$count];
+            $route->action = function (
+                \SlaxWeb\Router\Request $request,
+                \Symfony\Component\HttpFoundation\Response $response,
+                $tester
+            ) use ($count, $methods) {
+                $tester->call($methods[$count], $count);
+            };
+            $routes[] = $route;
+        }
+
+        return $routes;
+    }
 }

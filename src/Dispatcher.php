@@ -15,6 +15,9 @@
  */
 namespace SlaxWeb\Router;
 
+use SlaxWeb\Router\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 class Dispatcher
 {
     /**
@@ -58,5 +61,46 @@ class Dispatcher
         $this->_logger = $logger;
 
         $this->_logger->info("Router Dispatcher initialized");
+    }
+
+    /**
+     * Dispatch Request
+     *
+     * Dispatch the Request to the propper Route. Tries to find a matching Route
+     * for the retrieved Request object, and calls that Routes action callable
+     * along with Response, and any other input parameters as arguments for the
+     * action.
+     *
+     * @param \SlaxWeb\Router\Request $request Request object
+     * @param \Symfony\Component\HttpFoundation\Response $response Response
+     *                                                             object
+     * @param mixed $unknown Any further parameter is sent to Route action
+     * @return void
+     */
+    public function dispatch(Request $request, Response $response)
+    {
+        $requestMethod = $request->getMethod();
+        $requestUri = ltrim($request->getPathInfo(), "/");
+        $params = array_merge(
+            [$request, $response],
+            array_slice(func_get_args(), 2)
+        );
+
+        while (($route = $this->_routes->next()) !== false) {
+            if ($requestMethod !== $route->method) {
+                continue;
+            }
+
+            $uriMatch = preg_match($route->uri, $requestUri);
+            if ($uriMatch === 0) {
+                continue;
+            } elseif ($uriMatch === false) {
+                // throw error
+            }
+
+            call_user_func_array($route->action, $params);
+
+            break;
+        }
     }
 }
