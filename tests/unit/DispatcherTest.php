@@ -50,8 +50,15 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_container = $this->_getMock("\\SlaxWeb\\Router\\Container");
-        $this->_hooks = $this->_getMock("\\SlaxWeb\\Hooks\\Container");
+        $this->_container = $this->getMockBuilder(
+            "\\SlaxWeb\\Router\\Container"
+            )->disableOriginalConstructor()
+            ->setMethods([])
+            ->getMock();
+        $this->_hooks = $this->getMockBuilder("\\SlaxWeb\\Hooks\\Container")
+            ->disableOriginalConstructor()
+            ->setMethods([])
+            ->getMock();
         $this->_logger = $this->getMock("\\Psr\\Log\\LoggerInterface");
     }
 
