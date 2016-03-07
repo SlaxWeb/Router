@@ -52,7 +52,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $this->_container = $this->getMockBuilder(
             "\\SlaxWeb\\Router\\Container"
-            )->disableOriginalConstructor()
+        )->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
         $this->_hooks = $this->getMockBuilder("\\SlaxWeb\\Hooks\\Container")
@@ -93,20 +93,22 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testRouteExecution()
     {
+        // prepare container
         $routes = $this->_prepareRoutes();
-
         $this->_container->expects($this->exactly(3))
             ->method("next")
             ->will(
                 $this->onConsecutiveCalls($routes[0], $routes[1], $routes[2])
             );
 
+        // init the dispatcher
         $dispatcher = new Dispatcher(
             $this->_container,
             $this->_hooks,
             $this->_logger
         );
 
+        // mock the request, response, and a special tester mock
         $request = $this->getMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->once())
             ->method("getMethod")
@@ -120,6 +122,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             "\\Symfony\\Component\\HttpFoundation\\Response"
         );
 
+        // used to see what exactly gets passed to route actions
         $tester = $this->getMockBuilder("FakeTesterMock")
             ->setMethods(["call"])
             ->getMock();
@@ -151,7 +154,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 \SlaxWeb\Router\Request $request,
                 \Symfony\Component\HttpFoundation\Response $response,
                 $tester
-            ) use ($count, $methods) {
+            ) use (
+                $count,
+                $methods
+            ) {
                 $tester->call($methods[$count], $count);
             };
             $routes[] = $route;

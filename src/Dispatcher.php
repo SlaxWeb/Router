@@ -86,9 +86,8 @@ class Dispatcher
             array_slice(func_get_args(), 2)
         );
 
-        if (
-            ($route = $this->_findRoute($requestMethod, $requestUri)) !== null
-        ) {
+        $route = $this->_findRoute($requestMethod, $requestUri);
+        if ($route !== null) {
             call_user_func_array($route->action, $params);
         }
     }
