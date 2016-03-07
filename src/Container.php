@@ -31,6 +31,28 @@ class Container
     protected $_currentRoute = null;
 
     /**
+     * Logger
+     *
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $_logger = null;
+
+    /**
+     * Class constructor
+     *
+     * Store the retrieved logger that implements the \Psr\Log\LoggerInterface
+     * to the class protected property.
+     *
+     * @param \Psr\Log\LoggerInterface $logger Logger object
+     */
+    public function __construct(\Psr\Log\LoggerInterface $logger)
+    {
+        $this->_logger = $logger;
+
+        $this->_logger->info("Route Container initialized");
+    }
+
+    /**
      * Add Route definition
      *
      * Add the retrieved Route to the internal Routes container array. If the
@@ -44,12 +66,19 @@ class Container
         if ($route->uri === ""
             || $route->method === ""
             || $route->action === null) {
+            $this->_logger->error("Route incomplete. Unable to add");
+            $this->_logger->debug("Incomplete Route", [$route]);
             throw new Exception\RouteIncompleteException(
                 "Retrieved Route is not complete and can not be stored"
             );
         }
 
         $this->_routes[] = $route;
+
+        $this->_logger->info(
+            "Route successfully added to Container",
+            ["uri" => $route->uri]
+        );
 
         return $this;
     }
