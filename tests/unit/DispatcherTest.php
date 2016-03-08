@@ -19,6 +19,8 @@ use SlaxWeb\Router\Dispatcher;
 
 class DispatcherTest extends \PHPUnit_Framework_TestCase
 {
+    use \Codeception\Specify;
+
     /**
      * Routes Container
      *
@@ -189,48 +191,49 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-            // init the dispatcher
-            $dispatcher = new Dispatcher(
-                $this->_container,
-                $this->_hooks,
-                $this->_logger
-            );
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
 
-            // mock the request, response, and a special tester mock
-            $request = $this->getMock("\\SlaxWeb\\Router\\Request");
-            $request->expects($this->any())
-                ->method("getMethod")
-                ->willReturn("GET");
+        // mock the request, response, and a special tester mock
+        $request = $this->getMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
 
-            $request->expects($this->any())
-                ->method("getPathInfo")
-                ->willReturn("/uri1");
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("/uri1");
 
-            $response = $this->getMock(
-                "\\Symfony\\Component\\HttpFoundation\\Response"
-            );
+        $response = $this->getMock(
+            "\\Symfony\\Component\\HttpFoundation\\Response"
+        );
 
-            // used to see what exactly gets passed to route actions
-            $tester = $this->getMockBuilder("FakeTesterMock")
-                ->setMethods(["call"])
-                ->getMock();
-            $tester->expects($this->once())
-                ->method("call")
-                ->with("GET", 0);
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("GET", 0);
 
-            // normal execution
-            $dispatcher->dispatch($request, $response, $tester);
-            // stopped execution through hooks return value bool(false)
-            $dispatcher->dispatch($request, $response, $tester);
-            // stopped execution through hooks return value [bool(false)]
-            $dispatcher->dispatch($request, $response, $tester);
+        // normal execution
+        $dispatcher->dispatch($request, $response, $tester);
+        // stopped execution through hooks return value bool(false)
+        $dispatcher->dispatch($request, $response, $tester);
+        // stopped execution through hooks return value [bool(false)]
+        $dispatcher->dispatch($request, $response, $tester);
     }
 
     /**
      * Test 404 Route
      *
      * Ensure that the 404 Route is invoked when no matching Route definition is
-     * found, and that correct logging and hook calling occurs.
+     * found, and that correct logging and hook calling occurs. Ensure when no
+     * 404 route is found, that the 'RouteNotFoundException' is thrown.
      *
      * @return void
      */
@@ -238,61 +241,84 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         // prepare container
         $routes = $this->_prepareRoutes(1);
-        $routes[] = clone $routes[0];
-        $routes[1]->uri = "404RouteNotFound";
-        $routes[1]->method = "ANY";
-        $routes[1]->action = function (
-            \SlaxWeb\Router\Request $request,
-            \Symfony\Component\HttpFoundation\Response $response,
-            $tester
-        ) {
-            $tester->call(404);
-        };
 
-        $this->_container->expects($this->any())
-            ->method("next")
-            ->willReturn($routes[0], $routes[1], false);
+        // mock the request, response, and a special tester mock
+        $request = $this->getMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
 
-        // prepare hooks
-        $this->_hooks->expects($this->exactly(4))
-            ->method("exec")
-            ->withConsecutive(
-                ["router.dispatcher.afterInit"],
-                ["router.dispatcher.routeNotFound"],
-                ["router.dispatcher.beforeDispatch", $routes[1]],
-                ["router.dispatcher.afterDispatch"]
-            );
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("/noroute");
 
-            // init the dispatcher
-            $dispatcher = new Dispatcher(
-                $this->_container,
-                $this->_hooks,
-                $this->_logger
-            );
+        $response = $this->getMock(
+            "\\Symfony\\Component\\HttpFoundation\\Response"
+        );
 
-            // mock the request, response, and a special tester mock
-            $request = $this->getMock("\\SlaxWeb\\Router\\Request");
-            $request->expects($this->any())
-                ->method("getMethod")
-                ->willReturn("GET");
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with(404);
 
-            $request->expects($this->any())
-                ->method("getPathInfo")
-                ->willReturn("/noroute");
+        $this->specify(
+            "404 Route Execution",
+            function () use ($routes, $request, $response, $tester) {
+                $routes[] = clone $routes[0];
+                $routes[1]->uri = "404RouteNotFound";
+                $routes[1]->method = "ANY";
+                $routes[1]->action = function (
+                    \SlaxWeb\Router\Request $request,
+                    \Symfony\Component\HttpFoundation\Response $response,
+                    $tester
+                ) {
+                    $tester->call(404);
+                };
 
-            $response = $this->getMock(
-                "\\Symfony\\Component\\HttpFoundation\\Response"
-            );
+                $this->_container->expects($this->any())
+                    ->method("next")
+                    ->willReturn($routes[0], $routes[1], false);
 
-            // used to see what exactly gets passed to route actions
-            $tester = $this->getMockBuilder("FakeTesterMock")
-                ->setMethods(["call"])
-                ->getMock();
-            $tester->expects($this->once())
-                ->method("call")
-                ->with(404);
+                // prepare hooks
+                $this->_hooks->expects($this->exactly(4))
+                    ->method("exec")
+                    ->withConsecutive(
+                        ["router.dispatcher.afterInit"],
+                        ["router.dispatcher.routeNotFound"],
+                        ["router.dispatcher.beforeDispatch", $routes[1]],
+                        ["router.dispatcher.afterDispatch"]
+                    );
 
-            $dispatcher->dispatch($request, $response, $tester);
+                // init the dispatcher
+                $dispatcher = new Dispatcher(
+                    $this->_container,
+                    $this->_hooks,
+                    $this->_logger
+                );
+                $dispatcher->dispatch($request, $response, $tester);
+            }
+        );
+
+        $this->specify(
+            "404 Route Not Found Exception",
+            function () use ($routes, $request, $response, $tester) {
+                $this->_container->expects($this->any())
+                    ->method("next")
+                    ->willReturn($routes[0], false);
+
+                // init the dispatcher
+                $dispatcher = new Dispatcher(
+                    $this->_container,
+                    $this->_hooks,
+                    $this->_logger
+                );
+                $dispatcher->dispatch($request, $response, $tester);
+            },
+            ["throws" => "SlaxWeb\\Router\\Exception\\RouteNotFoundException"]
+        );
     }
 
     /**

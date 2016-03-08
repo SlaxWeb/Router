@@ -99,6 +99,11 @@ class Dispatcher
                 ($route->action)(...$params);
             }
             $this->_hooks->exec("router.dispatcher.afterDispatch");
+        } else {
+            throw new Exception\RouteNotFoundException(
+                "No Route definition found for Request URI '{$requestUri}' with"
+                . "HTTP Method '{$requestMethod}'"
+            );
         }
     }
 
