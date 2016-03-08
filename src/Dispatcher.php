@@ -106,7 +106,8 @@ class Dispatcher
      * Find matching Route
      *
      * Find the matching Route based on the Request Method and Request URI. If
-     * no matching route is found, null is returned. Otherwise the matching
+     * no matching route is found, the 404 route is returned, if found. If also
+     * the 404 Route is not found, then null is returned. Otherwise the matching
      * Route object is returned.
      *
      * @param string $method Request Method
@@ -115,7 +116,14 @@ class Dispatcher
      */
     protected function _findRoute(string $method, string $uri)
     {
+        $notFoundRoute = null;
+
         while (($route = $this->_routes->next()) !== false) {
+            if ($route->uri === "404RouteNotFound") {
+                $notFoundRoute = $route;
+                continue;
+            }
+
             if ($method !== $route->method) {
                 continue;
             }
@@ -131,6 +139,7 @@ class Dispatcher
             return $route;
         }
 
-        return null;
+        $this->_hooks->exec("router.dispatcher.routeNotFound");
+        return $notFoundRoute;
     }
 }
