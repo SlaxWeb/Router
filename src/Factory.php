@@ -14,6 +14,9 @@
  */
 namespace SlaxWeb\Router;
 
+use SlaxWeb\Logger\Factory as Logger;
+use SlaxWeb\Config\Container as Config;
+
 class Factory
 {
     /**
@@ -26,5 +29,21 @@ class Factory
     public static function newRoute(): Route
     {
         return new Route;
+    }
+
+    /**
+     * Initialize Routes Container
+     *
+     * Initializes the Routes Container. The Container requires the Logger, and
+     * it in turn requires the Config component, so this initialization method
+     * requires the Config component, even when the Container component does not
+     * need it directly.
+     *
+     * @param \SlaxWeb\Config\Container $config Configuration container
+     * @return Container
+     */
+    public static function container(Config $config): Container
+    {
+        return new Container(Logger::init($config));
     }
 }
