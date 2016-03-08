@@ -147,7 +147,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->specify("All definitons retrieved", function () {
             $count = 0;
             foreach ($this->_container->getAll() as $route) {
-                $this->assertEquals($count++, call_user_func($route->action));
+                $this->assertEquals($count++, ($route->action)());
                 $this->assertEquals("GET", $route->method);
                 $this->assertRegExp($route->uri, "uri{$count}");
             }
@@ -157,7 +157,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             "'next' returns first Route on first call",
             function () {
                 $route = $this->_container->next();
-                $this->assertEquals(0, call_user_func($route->action));
+                $this->assertEquals(0, ($route->action)());
                 $this->assertEquals("GET", $route->method);
                 $this->assertRegExp($route->uri, "uri1");
             }
@@ -167,7 +167,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             "'prev' returns last Route on first call",
             function () {
                 $route = $this->_container->prev();
-                $this->assertEquals(4, call_user_func($route->action));
+                $this->assertEquals(4, ($route->action)());
                 $this->assertEquals("GET", $route->method);
                 $this->assertRegExp($route->uri, "uri5");
             }
@@ -178,7 +178,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             function () {
                 $count = 0;
                 while ($route = $this->_container->next()) {
-                    $this->assertEquals($count++, call_user_func($route->action));
+                    $this->assertEquals($count++, ($route->action)());
                     $this->assertEquals("GET", $route->method);
                     $this->assertRegExp($route->uri, "uri{$count}");
                 }
@@ -192,7 +192,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 while ($route = $this->_container->prev()) {
                     $this->assertRegExp($route->uri, "uri" . $count--);
                     $this->assertEquals("GET", $route->method);
-                    $this->assertEquals($count, call_user_func($route->action));
+                    $this->assertEquals($count, ($route->action)());
                 }
             }
         );

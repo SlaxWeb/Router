@@ -65,7 +65,7 @@ class Route
     /**
      * Any Method
      */
-    const METHOD_ANY = "*";
+    const METHOD_ANY = "ANY";
 
     /**
      * Set Route data
@@ -124,5 +124,23 @@ class Route
         }
 
         return $this->{$property};
+    }
+
+    /**
+     * Set 404 Route
+     *
+     * Sets the '404NoRouteFound' Route to its properties. This Route is used by
+     * the Dispatcher if it can not find a matching Route for its Request.
+     *
+     * @param callable $action Route action
+     * @return self
+     */
+    public function set404Route(callable $action): self
+    {
+        $this->_uri = "404RouteNotFound";
+        $this->_method = self::METHOD_ANY;
+        $this->_action = $action;
+
+        return $this;
     }
 }
