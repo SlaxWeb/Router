@@ -79,7 +79,7 @@ class Route
      * @param callable $action Route action
      * @return self
      */
-    public function set(string $uri, string $method, callable $action)
+    public function set(string $uri, string $method, callable $action): self
     {
         if (in_array(
             $method,
