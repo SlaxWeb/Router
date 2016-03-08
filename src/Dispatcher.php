@@ -112,7 +112,7 @@ class Dispatcher
             $this->_logger->error("No Route found, and no 404 Route defined");
             throw new Exception\RouteNotFoundException(
                 "No Route definition found for Request URI '{$requestUri}' with"
-                . "HTTP Method '{$requestMethod}'"
+                . " HTTP Method '{$requestMethod}'"
             );
         }
     }
