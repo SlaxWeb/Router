@@ -107,6 +107,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 $this->onConsecutiveCalls($routes[0], $routes[1], $routes[2])
             );
 
+        $this->_logger->expects($this->exactly(4))
+            ->method("info");
+
         // init the dispatcher
         $dispatcher = new Dispatcher(
             $this->_container,
@@ -190,6 +193,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                     null
                 )
             );
+
+        $this->_logger->expects($this->exactly(8))
+            ->method("info");
 
         // init the dispatcher
         $dispatcher = new Dispatcher(
@@ -292,6 +298,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                         ["router.dispatcher.afterDispatch"]
                     );
 
+                $this->_logger->expects($this->exactly(3))
+                    ->method("info");
+
                 // init the dispatcher
                 $dispatcher = new Dispatcher(
                     $this->_container,
@@ -308,6 +317,12 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 $this->_container->expects($this->any())
                     ->method("next")
                     ->willReturn($routes[0], false);
+
+                $this->_logger->expects($this->exactly(20))
+                    ->method("info");
+
+                $this->_logger->expects($this->once())
+                    ->method("error");
 
                 // init the dispatcher
                 $dispatcher = new Dispatcher(

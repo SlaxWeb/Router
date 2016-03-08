@@ -83,6 +83,11 @@ class Dispatcher
     {
         $requestMethod = $request->getMethod();
         $requestUri = ltrim($request->getPathInfo(), "/");
+
+        $this->_logger->info(
+            "Trying to find match for ({$requestMethod}) '{$requestUri}'"
+        );
+
         $params = array_merge(
             [$request, $response],
             array_slice(func_get_args(), 2)
@@ -96,10 +101,15 @@ class Dispatcher
             );
             if (($result === false
                 || (is_array($result) && in_array(false, $result))) === false) {
+                $this->_logger->info(
+                    "Executing route definition",
+                    ["name" => $route->uri, "action" => $route->action]
+                );
                 ($route->action)(...$params);
             }
             $this->_hooks->exec("router.dispatcher.afterDispatch");
         } else {
+            $this->_logger->error("No Route found, and no 404 Route defined");
             throw new Exception\RouteNotFoundException(
                 "No Route definition found for Request URI '{$requestUri}' with"
                 . "HTTP Method '{$requestMethod}'"
@@ -141,6 +151,7 @@ class Dispatcher
             }
 
             $this->_hooks->exec("router.dispatcher.routeFound", $route);
+            $this->_logger->info("Route match found");
             return $route;
         }
 
