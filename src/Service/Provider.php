@@ -16,6 +16,7 @@ namespace SlaxWeb\Router\Service;
 
 use Pimple\Container;
 use SlaxWeb\Router\Route;
+use Slaxweb\Router\Container as RoutesContainer;
 
 class Provider extends \Pimple\ServiceProviderInterface
 {
@@ -33,5 +34,15 @@ class Provider extends \Pimple\ServiceProviderInterface
         $container["router.newRoute"] = $this->factory(function () {
             return new Route;
         });
+
+        /*
+         * Routes Container
+         *
+         * Requires the Logger Service Provider to be registered prior to its
+         * own instantiation.
+         */
+        $container["routesContainer.service"] = function (Container $cont) {
+            return new RoutesContainer($cont["logger.service"]);
+        };
     }
 }
