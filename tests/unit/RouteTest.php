@@ -75,7 +75,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->specify("Action is stored", function () {
             $this->assertTrue(
-                call_user_func($this->_route->action),
+                ($this->_route->action)(),
                 "Action did not return expected value"
             );
         });
