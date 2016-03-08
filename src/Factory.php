@@ -46,4 +46,23 @@ class Factory
     {
         return new Container(Logger::init($config));
     }
+
+    /**
+     * Initializes Route Dispatcher
+     *
+     * The Route Dispatcher requires the Routes Container, the Hooks Container,
+     * as well as the Logger. As the input it only requires the Config Container
+     * and it will instantiate all other components.
+     *
+     * @param \SlaxWeb\Config\Container $config Configuration container
+     * @return Dispatcher
+     */
+    public static function dispatcher(Config $config): Dispatcher
+    {
+        return new Dispatcher(
+            self::container($config),
+            Hooks::init($config),
+            $logger
+        );
+    }
 }
