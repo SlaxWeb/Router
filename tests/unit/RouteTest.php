@@ -120,4 +120,28 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             ["throws" => "SlaxWeb\\Router\\Exception\\UnknownPropertyException"]
         );
     }
+
+    /**
+     * Test set 404 Route
+     *
+     * Test that the Route class can set the 404 Route successfully, and that
+     * it sets the correct values.
+     *
+     * @return void
+     */
+    public function testSet404Route()
+    {
+        $this->_route->set404Route(function () {
+            return true;
+        });
+
+        $this->specify(
+            "404 Route set successfully",
+            function () {
+                $this->assertEquals("404RouteNotFound", $this->_route->uri);
+                $this->assertEquals("ANY", $this->_route->method);
+                $this->assertTrue(($this->_route->action)());
+            }
+        );
+    }
 }
