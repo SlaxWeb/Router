@@ -17,6 +17,7 @@ namespace SlaxWeb\Router\Service;
 use Pimple\Container;
 use SlaxWeb\Router\Route;
 use Slaxweb\Router\Container as RoutesContainer;
+use SlaxWeb\Router\Dispatcher as RouteDispatcher;
 
 class Provider extends \Pimple\ServiceProviderInterface
 {
@@ -43,6 +44,22 @@ class Provider extends \Pimple\ServiceProviderInterface
          */
         $container["routesContainer.service"] = function (Container $cont) {
             return new RoutesContainer($cont["logger.service"]);
+        };
+
+        /*
+         * Route Dispatcher
+         *
+         * Requires the Routes Container, the Hooks Container, and the Logger.
+         * This Service gathers all required services, and instantiates the
+         * Dispatcher. Just make sure all required service providers are
+         * registered prior to instantiating the Dispatcher
+         */
+        $container["routeDispatcher.service"] = function (Container $cont) {
+            return new RouteDispatcher(
+                $cont["routesContainer.service"],
+                $cont["hooks.service"],
+                $cont["logger.service"]
+            );
         };
     }
 }
