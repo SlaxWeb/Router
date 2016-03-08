@@ -105,16 +105,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 $this->onConsecutiveCalls($routes[0], $routes[1], $routes[2])
             );
 
-        // prepare hooks
-        $this->_hooks->expects($this->exactly(4))
-            ->method("exec")
-            ->withConsecutive(
-                ["router.dispatcher.afterInit"],
-                ["router.dispatcher.routeFound", $routes[2]],
-                ["router.dispatcher.beforeDispatch", $routes[2]],
-                ["router.dispatcher.afterDispatch"]
-            );
-
         // init the dispatcher
         $dispatcher = new Dispatcher(
             $this->_container,
@@ -159,7 +149,83 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testDispatcherHooks()
     {
+        // prepare container
+        $routes = $this->_prepareRoutes(1);
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->willReturn($routes[0]);
 
+        // prepare hooks
+        $this->_hooks->expects($this->exactly(10))
+            ->method("exec")
+            ->withConsecutive(
+                // normal execution
+                ["router.dispatcher.afterInit"],
+                ["router.dispatcher.routeFound", $routes[0]],
+                ["router.dispatcher.beforeDispatch", $routes[0]],
+                ["router.dispatcher.afterDispatch"],
+                // stop by returning bool(false)
+                ["router.dispatcher.routeFound", $routes[0]],
+                ["router.dispatcher.beforeDispatch", $routes[0]],
+                ["router.dispatcher.afterDispatch"],
+                // stop by returning [bool(false)]
+                ["router.dispatcher.routeFound", $routes[0]],
+                ["router.dispatcher.beforeDispatch", $routes[0]],
+                ["router.dispatcher.afterDispatch"]
+            )->will(
+                $this->onConsecutiveCalls(
+                    // normal execution
+                    null,
+                    null,
+                    "some return value",
+                    null,
+                    // stop by returning bool(false)
+                    null,
+                    false,
+                    null,
+                    // stop by returning [bool(false)]
+                    null,
+                    [false],
+                    null
+                )
+            );
+
+            // init the dispatcher
+            $dispatcher = new Dispatcher(
+                $this->_container,
+                $this->_hooks,
+                $this->_logger
+            );
+
+            // mock the request, response, and a special tester mock
+            $request = $this->getMock("\\SlaxWeb\\Router\\Request");
+            $request->expects($this->any())
+                ->method("getMethod")
+                ->willReturn("GET");
+
+            $request->expects($this->any())
+                ->method("getPathInfo")
+                ->willReturn("/uri1");
+
+            $response = $this->getMock(
+                "\\Symfony\\Component\\HttpFoundation\\Response"
+            );
+
+            // used to see what exactly gets passed to route actions
+            $tester = $this->getMockBuilder("FakeTesterMock")
+                ->setMethods(["call"])
+                ->getMock();
+            $tester->expects($this->once())
+                ->method("call")
+                ->with("GET", 0);
+
+
+            // normal execution
+            $dispatcher->dispatch($request, $response, $tester);
+            // stopped execution through hooks return value bool(false)
+            $dispatcher->dispatch($request, $response, $tester);
+            // stopped execution through hooks return value [bool(false)]
+            $dispatcher->dispatch($request, $response, $tester);
     }
 
     /**
@@ -167,26 +233,32 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      *
      * Prepare some fake routes for tests.
      *
+     * @param int $amount Amount of Routes to return
      * @return array
      */
-    protected function _prepareRoutes()
+    protected function _prepareRoutes(int $amount = 6)
     {
         $routeMock = $this->getMock("\\SlaxWeb\\Router\\Route");
         $routes = [];
         $methods = ["GET", "POST", "PUT", "DELETE", "CLI", "ANY"];
-        for ($count = 0; $count < 6; $count++) {
+        for ($count = 0; $count < $amount; $count++) {
+            $method = $count > (count($methods) - 1)
+                ? $methods[$count % count($methods)]
+                : $methods[$count];
+
             $route = clone $routeMock;
             $route->uri = "~^uri" . ($count + 1) . "$~";
-            $route->method = $methods[$count];
+            $route->method = $method;
+
             $route->action = function (
                 \SlaxWeb\Router\Request $request,
                 \Symfony\Component\HttpFoundation\Response $response,
                 $tester
             ) use (
                 $count,
-                $methods
+                $method
             ) {
-                $tester->call($methods[$count], $count);
+                $tester->call($method, $count);
             };
             $routes[] = $route;
         }

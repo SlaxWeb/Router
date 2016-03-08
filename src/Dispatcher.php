@@ -94,11 +94,10 @@ class Dispatcher
                 "router.dispatcher.beforeDispatch",
                 $route
             );
-            if ($result === false
-                || (is_array($result) && in_array(false, $result))) {
-                return;
+            if (($result === false
+                || (is_array($result) && in_array(false, $result))) === false) {
+                ($route->action)(...$params);
             }
-            ($route->action)(...$params);
             $this->_hooks->exec("router.dispatcher.afterDispatch");
         }
     }
@@ -114,7 +113,7 @@ class Dispatcher
      * @param string $uri Request Uri
      * @return \SlaxWeb\Router\Route|null
      */
-    protected function _findRoute(string $method, string $uri): Route
+    protected function _findRoute(string $method, string $uri)
     {
         while (($route = $this->_routes->next()) !== false) {
             if ($method !== $route->method) {
