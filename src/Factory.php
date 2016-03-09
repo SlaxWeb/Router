@@ -17,6 +17,7 @@ namespace SlaxWeb\Router;
 use SlaxWeb\Hooks\Factory as Hooks;
 use SlaxWeb\Logger\Factory as Logger;
 use SlaxWeb\Config\Container as Config;
+use Symfony\Component\HttpFoundation\Response;
 
 class Factory
 {
@@ -76,5 +77,30 @@ class Factory
             Hooks::init($config),
             Logger::init($config)
         );
+    }
+
+    /**
+     * Get Request Object
+     *
+     * Creates a new Request object from superglobalsand returns it to the
+     * caller.
+     *
+     * @return \SlaxWeb\Router\Request
+     */
+    public static function getRequest(): Request
+    {
+        return Request::createFromGlobals();
+    }
+
+    /**
+     * Get Response Object
+     *
+     * Creates a new empty Response object and returns i to the caller.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public static function getResponse(): Response
+    {
+        return new Response;
     }
 }
