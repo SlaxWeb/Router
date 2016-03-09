@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use SlaxWeb\Router\Container as RoutesContainer;
 use SlaxWeb\Router\Dispatcher as RouteDispatcher;
 
-class Provider extends \Pimple\ServiceProviderInterface
+class Provider implements \Pimple\ServiceProviderInterface
 {
     /**
      * Register provider
