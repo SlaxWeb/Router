@@ -16,7 +16,7 @@ namespace SlaxWeb\Router\Service;
 
 use Pimple\Container;
 use SlaxWeb\Router\Route;
-use Slaxweb\Router\Container as RoutesContainer;
+use SlaxWeb\Router\Container as RoutesContainer;
 use SlaxWeb\Router\Dispatcher as RouteDispatcher;
 
 class Provider extends \Pimple\ServiceProviderInterface
@@ -32,7 +32,7 @@ class Provider extends \Pimple\ServiceProviderInterface
     public function register(Container $container)
     {
         // new Route class instance
-        $container["router.newRoute"] = $this->factory(function () {
+        $container["router.newRoute"] = $container->factory(function () {
             return new Route;
         });
 
