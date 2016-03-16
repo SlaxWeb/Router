@@ -146,8 +146,6 @@ class Dispatcher
             $uriMatch = preg_match($route->uri, $uri);
             if ($uriMatch === 0) {
                 continue;
-            } elseif ($uriMatch === false) {
-                // throw error
             }
 
             $this->_hooks->exec("router.dispatcher.routeFound", $route);
