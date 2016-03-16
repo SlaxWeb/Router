@@ -42,6 +42,13 @@ class Dispatcher
     protected $_logger = null;
 
     /**
+     * 404 Route
+     *
+     * @var \SlaxWeb\Router\Route
+     */
+    protected $_404Route = null;
+
+    /**
      * Class constructor
      *
      * Set retrieved Routes Container, Hooks Container, and the Logger to the
@@ -94,11 +101,18 @@ class Dispatcher
         );
 
         $route = $this->_findRoute($requestMethod, $requestUri);
+        if ($route === null) {
+            $response->setStatusCode(404);
+            if ($this->_404Route !== null) {
+                $route = $this->_404Route;
+            }
+        }
         if ($route !== null) {
             $result = $this->_hooks->exec(
                 "router.dispatcher.beforeDispatch",
                 $route
             );
+            // check hook results permit route execution
             if (($result === false
                 || (is_array($result) && in_array(false, $result))) === false) {
                 $this->_logger->info(
@@ -131,11 +145,9 @@ class Dispatcher
      */
     protected function _findRoute(string $method, string $uri)
     {
-        $notFoundRoute = null;
-
         while (($route = $this->_routes->next()) !== false) {
             if ($route->uri === "404RouteNotFound") {
-                $notFoundRoute = $route;
+                $this->_404Route = $route;
                 continue;
             }
 
@@ -154,6 +166,6 @@ class Dispatcher
         }
 
         $this->_hooks->exec("router.dispatcher.routeNotFound");
-        return $notFoundRoute;
+        return null;
     }
 }
