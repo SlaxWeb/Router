@@ -1,10 +1,10 @@
 <?php
 /**
- * Request class Tests
+ * Request class
  *
- * The Request class must extend the Symfony\Component\HttpFoundation\Request
- * class and provide an additional 'addQuery' method for adding parameters to
- * the query parameters. This test ensures that this method functions properly.
+ * The Request class extends the Symfony\Component\HttpFoundation\Request class
+ * and provides an additional 'addQuery' method for adding parameters to the
+ * query parameters
  *
  * @package   SlaxWeb\Router
  * @author    Tomaz Lovrec <tomaz.lovrec@gmail.com>
