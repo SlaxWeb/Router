@@ -96,7 +96,7 @@ class Factory
      *
      * Creates a new empty Response object and returns i to the caller.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \SlaxWeb\Router\Response
      */
     public static function getResponse(): Response
     {

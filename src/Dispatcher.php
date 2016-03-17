@@ -16,7 +16,7 @@
 namespace SlaxWeb\Router;
 
 use SlaxWeb\Router\Request;
-use Symfony\Component\HttpFoundation\Response;
+use SlaxWeb\Router\Response;
 
 class Dispatcher
 {
@@ -88,8 +88,7 @@ class Dispatcher
      * action.
      *
      * @param \SlaxWeb\Router\Request $request Request object
-     * @param \Symfony\Component\HttpFoundation\Response $response Response
-     *                                                             object
+     * @param \SlaxWeb\Router\Reponse $response Response object
      * @param mixed $unknown Any further parameter is sent to Route action
      * @return void
      */
