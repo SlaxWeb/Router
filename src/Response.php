@@ -15,7 +15,7 @@
  */
 namespace SlaxWeb\Router;
 
-class Request extends \Symfony\Component\HttpFoundation\Request
+class Response extends \Symfony\Component\HttpFoundation\Request
 {
     /**
      * Add To Content
