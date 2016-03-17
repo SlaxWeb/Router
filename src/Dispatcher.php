@@ -102,11 +102,6 @@ class Dispatcher
             "Trying to find match for ({$requestMethod}) '{$requestUri}'"
         );
 
-        $params = array_merge(
-            [$request, $response],
-            array_slice(func_get_args(), 2)
-        );
-
         $route = $this->_findRoute($requestMethod, $requestUri);
         if ($route === null) {
             $response->setStatusCode(404);
@@ -116,9 +111,14 @@ class Dispatcher
         }
         if ($route !== null) {
             // add query parameters if defined
-            if ($this->_addQueryParams !== []) {
-                $request->addQuery($this->_addQeuryParams);
+            if (empty($this->_addQueryParams) === false) {
+                $request->addQuery($this->_addQueryParams);
             }
+
+            $params = array_merge(
+                [$request, $response],
+                array_slice(func_get_args(), 2)
+            );
 
             $result = $this->_hooks->exec(
                 "router.dispatcher.beforeDispatch",
@@ -179,7 +179,9 @@ class Dispatcher
             $this->_hooks->exec("router.dispatcher.routeFound", $route);
             $this->_logger->info("Route match found");
 
-            $this->_addParams($matches);
+            if (is_array($matches)) {
+                $this->_addParams($matches);
+            }
 
             return $route;
         }
@@ -211,7 +213,8 @@ class Dispatcher
                         $counters[$type] = 0;
                     }
                     $counters[$type]++;
-                    return "(?P<{$type}{$counters["type"]}.+?)";
+                    $changed = "(?P<{$type}{$counters[$type]}>.+?)";
+                    return $changed;
                 },
                 $regex
             );
@@ -233,6 +236,7 @@ class Dispatcher
     {
         $params = [];
         foreach ($matches as $key => $value) {
+            $value = $value[0];
             if (strpos($key, "params") === 0) {
                 $params["parameters"] = array_merge(
                     $params["parameters"] ?? [],

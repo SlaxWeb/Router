@@ -369,11 +369,11 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function stSpecialUriMatchers()
+    public function testSpecialUriMatchers()
     {
         // prepare container
         $routes = $this->_prepareRoutes(1);
-        $routes[0]->uri = "test/[:params:]/named/[:named:]";
+        $routes[0]->uri = "~^test/[:params:]/named/[:named:]$~";
 
         // mock the request, response, and a special tester mock
         $request = $this->getMock("\\SlaxWeb\\Router\\Request");
@@ -385,10 +385,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->method("getPathInfo")
             ->willReturn("/test/param1/param2/named/param1/value1");
 
-        $request->expects($this->exactly(2))
+        $request->expects($this->once())
             ->method("addQuery")
             ->withConsecutive(
-                ["parameters" => ["param1", "param2"], "param1" => "value1"]
+                [["parameters" => ["param1", "param2"], "param1" => "value1"]]
             );
 
         $response = $this->getMock(
