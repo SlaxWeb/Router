@@ -49,6 +49,13 @@ class Dispatcher
     protected $_404Route = null;
 
     /**
+     * Additional query params
+     *
+     * @var array
+     */
+    protected $_addQueryParams = [];
+
+    /**
      * Class constructor
      *
      * Set retrieved Routes Container, Hooks Container, and the Logger to the
@@ -108,6 +115,11 @@ class Dispatcher
             }
         }
         if ($route !== null) {
+            // add query parameters if defined
+            if ($this->_addQueryParams !== []) {
+                $request->addQuery($this->_addQeuryParams);
+            }
+
             $result = $this->_hooks->exec(
                 "router.dispatcher.beforeDispatch",
                 $route
@@ -155,17 +167,95 @@ class Dispatcher
                 continue;
             }
 
-            $uriMatch = preg_match($route->uri, $uri);
+            $uriMatch = preg_match_all(
+                $this->_definedPosix2Pcre($route->uri),
+                $uri,
+                $matches
+            );
             if ($uriMatch === 0) {
                 continue;
             }
 
             $this->_hooks->exec("router.dispatcher.routeFound", $route);
             $this->_logger->info("Route match found");
+
+            $this->_addParams($matches);
+
             return $route;
         }
 
         $this->_hooks->exec("router.dispatcher.routeNotFound");
         return null;
+    }
+
+    /**
+     * POSIX named class to PCRE capturing group
+     *
+     * Replace the special POSIX named classes with normal named capturing
+     * groups.
+     *
+     * @param string $regex Raw regexp string
+     * @param array $names POSIX class names array, default: ["params", "named"]
+     * @return string Replaced regexp string
+     */
+    protected function _definedPosix2Pcre(
+        string $regex,
+        array $names = ["params", "named"]
+    ): string {
+        $counters = [];
+        foreach ($names as $type) {
+            $regex = preg_replace_callback(
+                "~\[:{$type}:\]~",
+                function (array $matches) use (&$counters, $type) {
+                    if (isset($counters[$type]) === false) {
+                        $counters[$type] = 0;
+                    }
+                    $counters[$type]++;
+                    return "(?P<{$type}{$counters["type"]}.+?)";
+                },
+                $regex
+            );
+        }
+
+        return $regex;
+    }
+
+    /**
+     * Add additional parameters
+     *
+     * Prepares the found matches from the URI and injects them into the
+     * '_addQueryParams' property.
+     *
+     * @param array $matches Regex matches
+     * @return void
+     */
+    protected function _addParams(array $matches)
+    {
+        $params = [];
+        foreach ($matches as $key => $value) {
+            if (strpos($key, "params") === 0) {
+                $params["parameters"] = array_merge(
+                    $params["parameters"] ?? [],
+                    explode("/", $value)
+                );
+            }
+
+            if (strpos($key, "named") === 0) {
+                $named = [];
+                $key = "";
+                foreach (explode("/", $value) as $param) {
+                    if ($key === "") {
+                        $key = $param;
+                        $named[$key] = "";
+                    } else {
+                        $named[$key] = $param;
+                        $key = "";
+                    }
+                }
+                $params = array_merge($params, $named);
+            }
+        }
+
+        $this->_addQueryParams = $params;
     }
 }

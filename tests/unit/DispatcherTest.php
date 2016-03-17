@@ -361,6 +361,60 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test Special URI Matchers
+     *
+     * Tests that the special '[:params:]' and '[:named:]' match keywords work
+     * as expected. Both should match anything non-greedy and push found
+     * parameters to the Request object.
+     *
+     * @return void
+     */
+    public function stSpecialUriMatchers()
+    {
+        // prepare container
+        $routes = $this->_prepareRoutes(1);
+        $routes[0]->uri = "test/[:params:]/named/[:named:]";
+
+        // mock the request, response, and a special tester mock
+        $request = $this->getMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("/test/param1/param2/named/param1/value1");
+
+        $request->expects($this->exactly(2))
+            ->method("addQuery")
+            ->withConsecutive(
+                ["parameters" => ["param1", "param2"], "param1" => "value1"]
+            );
+
+        $response = $this->getMock(
+            "\\Symfony\\Component\\HttpFoundation\\Response"
+        );
+
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->willReturn($routes[0], false);
+
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
      * Prepare routes
      *
      * Prepare some fake routes for tests.
