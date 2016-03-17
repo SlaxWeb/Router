@@ -126,7 +126,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn("/uri3");
 
         $response = $this->getMock(
-            "\\Symfony\\Component\\HttpFoundation\\Response"
+            "\\SlaxWeb\\Router\\Response"
         );
 
         // used to see what exactly gets passed to route actions
@@ -213,7 +213,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn("/uri1");
 
         $response = $this->getMock(
-            "\\Symfony\\Component\\HttpFoundation\\Response"
+            "\\Slaxweb\\Router\\Response"
         );
 
         // used to see what exactly gets passed to route actions
@@ -257,7 +257,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn("/noroute");
 
         $response = $this->getMock(
-            "\\Symfony\\Component\\HttpFoundation\\Response"
+            "\\SlaxWeb\\Router\\Response"
         );
 
         // used to see what exactly gets passed to route actions
@@ -273,7 +273,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $routes[1]->method = "ANY";
         $routes[1]->action = function (
             \SlaxWeb\Router\Request $request,
-            \Symfony\Component\HttpFoundation\Response $response,
+            \SlaxWeb\Router\Response $response,
             $tester
         ) {
             $tester->call(404);
@@ -329,7 +329,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn("/noroute");
 
         $response = $this->getMock(
-            "\\Symfony\\Component\\HttpFoundation\\Response"
+            "\\SlaxWeb\\Router\\Response"
         );
 
         // used to see what exactly gets passed to route actions
@@ -392,7 +392,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             );
 
         $response = $this->getMock(
-            "\\Symfony\\Component\\HttpFoundation\\Response"
+            "\\SlaxWeb\\Router\\Response"
         );
 
         // used to see what exactly gets passed to route actions
@@ -438,7 +438,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
             $route->action = function (
                 \SlaxWeb\Router\Request $request,
-                \Symfony\Component\HttpFoundation\Response $response,
+                \SlaxWeb\Router\Response $response,
                 $tester
             ) use (
                 $count,
