@@ -367,11 +367,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      * as expected. Both should match anything non-greedy and push found
      * parameters to the Request object.
      *
-     * @todo Enable test when functionality is available
-     *
      * @return void
      */
-    public function _testSpecialUriMatchers()
+    public function stSpecialUriMatchers()
     {
         // prepare container
         $routes = $this->_prepareRoutes(1);
