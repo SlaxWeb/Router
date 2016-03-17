@@ -17,7 +17,6 @@ namespace SlaxWeb\Router;
 use SlaxWeb\Hooks\Factory as Hooks;
 use SlaxWeb\Logger\Factory as Logger;
 use SlaxWeb\Config\Container as Config;
-use Symfony\Component\HttpFoundation\Response;
 
 class Factory
 {

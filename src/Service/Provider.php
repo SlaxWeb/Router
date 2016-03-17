@@ -17,7 +17,7 @@ namespace SlaxWeb\Router\Service;
 use Pimple\Container;
 use SlaxWeb\Router\Route;
 use SlaxWeb\Router\Request;
-use Symfony\Component\HttpFoundation\Response;
+use SlaxWeb\Router\Response;
 use SlaxWeb\Router\Container as RoutesContainer;
 use SlaxWeb\Router\Dispatcher as RouteDispatcher;
 
