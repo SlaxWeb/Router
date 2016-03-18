@@ -48,7 +48,7 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
 
         foreach ($this->_routes as $route) {
             $newRoute = $container["router.newRoute"];
-            $newRoute->add(
+            $newRoute->set(
                 ($route["uri"] ?? null),
                 ($route["method"] ?? null),
                 ($route["action"] ?? null)
@@ -56,7 +56,7 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
 
             $container["routesContainer.service"]->add($newRoute);
         }
-    
+    }
 
     /**
      * Define Routes
