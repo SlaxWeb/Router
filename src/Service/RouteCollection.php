@@ -17,11 +17,11 @@ namespace SlaxWeb\Router\Service;
 abstract class RouteCollection implements \Pimple\ServiceProviderInterface
 {
     /**
-     * Container
+     * Application Container
      *
      * @var \Pimple\Container
      */
-    protected $_container = null;
+    protected $_app = null;
 
     /**
      * Routes
@@ -43,7 +43,7 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
      */
     public function register(\Pimple\Container $container)
     {
-        $this->_container = $container;
+        $this->_app = $container;
         $this->define();
 
         foreach ($this->_routes as $route) {
