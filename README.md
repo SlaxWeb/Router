@@ -1,9 +1,13 @@
 # Router
 
+[![Build Status](https://travis-ci.org/SlaxWeb/Router.svg?branch=0.3.0)](https://travis-ci.org/SlaxWeb/Router)
+
 The Router Component is one of the core components of the SlaxWeb/Framework, but
 it can be used separately as well. It relies on the following components:
 * [Logger](https://github.com/SlaxWeb/Logger)
 * [Hooks](https://github.com/SlaxWeb/Hooks)
+* [Config](https://github.com/SlaxWeb/Config)
+* [Symfony HTTP Foundation](https://github.com/symfony/http-foundation)
 
 The Router helps you route your incoming requests to the correct code, and is
 one of the essential components in modern web applications, especially those who
@@ -16,13 +20,9 @@ Installation is currently available only through composer, and can be achieved
 by putting the following into your *composer.json* file:
 ```json
 "require": {
-    "slaxweb/router": "dev-develop"
-},
-"minimum-stability": "dev"
+    "slaxweb/router": "~0.3"
+}
 ```
-
-The minimum stability option is required, as the development state of the Router
-relies on other development packages.
 
 ## Usage
 
