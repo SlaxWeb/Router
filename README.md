@@ -20,8 +20,9 @@ Installation is currently available only through composer, and can be achieved
 by putting the following into your *composer.json* file:
 ```json
 "require": {
-    "slaxweb/router": "~0.3"
-}
+    "slaxweb/router": "0.4.*@dev"
+},
+"minimum-stability": "dev"
 ```
 
 ## Usage

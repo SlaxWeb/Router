@@ -11,9 +11,10 @@
     ],
     "require": {
 		"php":">=7.0.0",
-        "slaxweb/hooks": "~0.4",
+        "slaxweb/hooks": "0.5.*@dev",
         "slaxweb/logger": "~0.2",
         "slaxweb/config": "~0.1",
+        "slaxweb/getset": "0.1.*@dev",
         "symfony/http-foundation": "~3.0"
     },
     "require-dev": {
@@ -34,5 +35,6 @@
         "branch-alias": {
             "dev-develop": "0.4.x-dev"
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
