@@ -16,6 +16,8 @@ namespace SlaxWeb\Router;
 
 class Route
 {
+    use \SlaxWeb\GetSet\MagicGet;
+
     /**
      * URI
      *
@@ -102,28 +104,6 @@ class Route
         $this->_action = $action;
 
         return $this;
-    }
-
-    /**
-     * Get magic method
-     *
-     * Used to retrieved protected class properties.
-     *
-     * @param string $param Name of the protected parameter, without the
-     *                      underscore.
-     * @return mixed
-     */
-    public function __get($param)
-    {
-        $property = "_{$param}";
-        if (isset($this->{$property}) === false) {
-            throw new Exception\UnknownPropertyException(
-                "Property '{$param}' does not exist in " . __CLASS__
-                . ", unable to get value."
-            );
-        }
-
-        return $this->{$property};
     }
 
     /**

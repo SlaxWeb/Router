@@ -117,7 +117,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             function () {
                 $this->_route->unknown;
             },
-            ["throws" => "SlaxWeb\\Router\\Exception\\UnknownPropertyException"]
+            ["throws" => "SlaxWeb\\Exception\\UnknownPropertyException"]
         );
     }
 
