@@ -45,7 +45,7 @@ class Provider implements \Pimple\ServiceProviderInterface
          * own instantiation.
          */
         $container["routesContainer.service"] = function (Container $cont) {
-            return new RoutesContainer($cont["logger.service"]);
+            return new RoutesContainer($cont["logger.service"]());
         };
 
         /*
@@ -60,7 +60,7 @@ class Provider implements \Pimple\ServiceProviderInterface
             return new RouteDispatcher(
                 $cont["routesContainer.service"],
                 $cont["hooks.service"],
-                $cont["logger.service"]
+                $cont["logger.service"]()
             );
         };
 
