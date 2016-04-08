@@ -66,7 +66,14 @@ class Provider implements \Pimple\ServiceProviderInterface
 
         // new Request object from superglobals
         $container["request.service"] = function () {
-            return Request::createFromGlobals();
+            if (isset($cont["requestParams"])) {
+                return Request::create(
+                    $cont["requestParams"]["uri"],
+                    $cont["requestParams"]["method"]
+                );
+            } else {
+                return Request::createFromGlobals();
+            }
         };
 
         // new empty Response object
