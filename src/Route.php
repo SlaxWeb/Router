@@ -86,9 +86,10 @@ class Route
      * @param string $uri Request URI regex without delimiter
      * @param string $method HTTP Request Method, accepts METHODO_* constant
      * @param callable $action Route action
+     * @param bool $default Should the route be marked as default. Default bool(false)
      * @return self
      */
-    public function set(string $uri, string $method, callable $action): self
+    public function set(string $uri, string $method, callable $action, bool $default = false): self
     {
         if (in_array(
             $method,
@@ -109,6 +110,7 @@ class Route
         $this->_uri = "~^{$uri}$~";
         $this->_method = $method;
         $this->_action = $action;
+        $this->_isDefault = $default;
 
         return $this;
     }
