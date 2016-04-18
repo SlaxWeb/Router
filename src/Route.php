@@ -40,6 +40,13 @@ class Route
     protected $_callable = null;
 
     /**
+     * Is default route
+     *
+     * @var bool
+     */
+    protected $_isDefault = false;
+
+    /**
      * Method GET
      */
     const METHOD_GET = "GET";

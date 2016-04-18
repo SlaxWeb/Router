@@ -54,7 +54,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_logger = $this->getMock("\\Psr\\Log\\LoggerInterface");
+        $this->_logger = $this->createMock("\\Psr\\Log\\LoggerInterface");
 
         $this->_container = new Container($this->_logger);
 
