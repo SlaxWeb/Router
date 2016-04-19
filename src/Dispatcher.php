@@ -166,6 +166,11 @@ class Dispatcher
                 continue;
             }
 
+            // Default URI, check if default route?
+            if ($uri === "" && $route->isDefault) {
+                return $route;
+            }
+
             $uriMatch = preg_match_all(
                 $this->_definedPosix2Pcre($route->uri),
                 $uri,

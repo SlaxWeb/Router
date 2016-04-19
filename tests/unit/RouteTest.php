@@ -79,6 +79,36 @@ class RouteTest extends \PHPUnit_Framework_TestCase
                 "Action did not return expected value"
             );
         });
+
+        $this->specify("Non-default route", function () {
+            $this->assertFalse(
+                $this->_route->isDefault,
+                "Defined route is not non-default route"
+            );
+
+        });
+    }
+
+    /**
+     * Test default route
+     *
+     * Ensure that the 4th parameter controls the default route property.
+     *
+     * @return void
+     */
+    public function testDefaultRoute()
+    {
+        $this->_route->set("uri", Route::METHOD_GET, function () {
+            return true;
+        }, true);
+
+        $this->specify("Default route", function () {
+            $this->assertTrue(
+                $this->_route->isDefault,
+                "Defined route is not default route"
+            );
+
+        });
     }
 
     /**
