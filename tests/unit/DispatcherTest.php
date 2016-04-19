@@ -474,6 +474,74 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test multiple URI matches
+     *
+     * Test that router correctly dispatches a request when multiple URIs are
+     * found in the route definition regex separated by OR(|).
+     *
+     * @return void
+     */
+    public function testMultipleURIMatches()
+    {
+        $route = new \SlaxWeb\Router\Route;
+        $route->set("uri1$|^uri2|uri3", "GET", function (
+            \SlaxWeb\Router\Request $request,
+            \SlaxWeb\Router\Response $response,
+            $tester
+        ) {
+            $tester->call($request->getPathInfo(), 1);
+        }, true);
+
+        // prepare container
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->will(
+                $this->onConsecutiveCalls($route, $route, $route, $route, false)
+            );
+
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->will(
+                $this->onConsecutiveCalls("/", "/", "/uri1", "/uri1", "/uri2", "/uri2", "/uri3", "/uri3")
+            );
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->exactly(4))
+            ->method("call")
+            ->withConsecutive(
+                ["/", 1],
+                ["/uri1", 1],
+                ["/uri2", 1],
+                ["/uri3", 1]
+            );
+
+        $dispatcher->dispatch($request, $response, $tester);
+        $dispatcher->dispatch($request, $response, $tester);
+        $dispatcher->dispatch($request, $response, $tester);
+        $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
      * Prepare routes
      *
      * Prepare some fake routes for tests.

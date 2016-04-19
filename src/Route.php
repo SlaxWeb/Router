@@ -107,7 +107,7 @@ class Route
             );
         }
 
-        $this->_uri = "~^{$uri}$~";
+        $this->_uri = preg_replace("~([^\\\\])\\$?\|\\^?~", "$1$|^", "~^{$uri}$~");
         $this->_method = $method;
         $this->_action = $action;
         $this->_isDefault = $default;
