@@ -74,9 +74,9 @@ class Provider implements \Pimple\ServiceProviderInterface
                 $request = Request::create(
                     $cont["requestParams"]["uri"],
                     $method,
-                    ${$paramsVarName},
+                    array_merge($_GET, $_POST),
                     $_COOKIE,
-                    $_FILES
+                    $_FILES,
                     $_SERVER
                 );
 
