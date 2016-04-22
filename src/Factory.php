@@ -17,6 +17,7 @@ namespace SlaxWeb\Router;
 use SlaxWeb\Hooks\Factory as Hooks;
 use SlaxWeb\Logger\Factory as Logger;
 use SlaxWeb\Config\Container as Config;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Factory
 {
@@ -81,14 +82,42 @@ class Factory
     /**
      * Get Request Object
      *
-     * Creates a new Request object from superglobalsand returns it to the
-     * caller.
+     * Creates a new Request object from superglobals or pre set request params,
+     * and returns it to the caller.
      *
+     * @param array $requestParams Pre-set request parameters
      * @return \SlaxWeb\Router\Request
      */
-    public static function getRequest(): Request
+    public static function getRequest(array $requestParams = []): Request
     {
-        return Request::createFromGlobals();
+        $request = null;
+        if (isset($requestParams)) {
+            $method = $requestParams["method"] ?? $_SERVER["REQUEST_METHOD"];
+            $paramsVarName = $method === "POST" ? "_POST" : "_GET";
+            $request = Request::create(
+                $requestParams["uri"],
+                $method,
+                ${$paramsVarName},
+                $_COOKIE,
+                $_FILES
+                $_SERVER
+            );
+
+            /*
+             * prepare request parameters from request content, copy from
+             * Symfony Http Foundation Request method "createFromGlobals"
+             */
+            if (strpos($request->headers->get("CONTENT_TYPE"), "application/x-www-form-urlencoded" === 0)
+                && in_array(strtoupper($request->server->get("REQUEST_METHOD", "GET")),
+                    ["PUT", "DELETE", "PATCH"])) {
+                parse_str($request->getContent(), $data);
+                $request->request = new ParameterBag($data);
+            }
+        } else {
+            $request = Request::createFromGlobals();
+        }
+
+        return $request;
     }
 
     /**

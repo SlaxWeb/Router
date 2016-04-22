@@ -20,6 +20,7 @@ use SlaxWeb\Router\Request;
 use SlaxWeb\Router\Response;
 use SlaxWeb\Router\Container as RoutesContainer;
 use SlaxWeb\Router\Dispatcher as RouteDispatcher;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Provider implements \Pimple\ServiceProviderInterface
 {
@@ -64,16 +65,36 @@ class Provider implements \Pimple\ServiceProviderInterface
             );
         };
 
-        // new Request object from superglobals
+        // new Request object from superglobals or pre set base url
         $container["request.service"] = function (Container $cont) {
+            $request = null;
             if (isset($cont["requestParams"])) {
-                return Request::create(
+                $method = $cont["requestParams"]["method"] ?? $_SERVER["REQUEST_METHOD"];
+                $paramsVarName = $method === "POST" ? "_POST" : "_GET";
+                $request = Request::create(
                     $cont["requestParams"]["uri"],
-                    $cont["requestParams"]["method"]
+                    $method,
+                    array_merge($_GET, $_POST),
+                    $_COOKIE,
+                    $_FILES,
+                    $_SERVER
                 );
+
+                /*
+                 * prepare request parameters from request content, copy from
+                 * Symfony Http Foundation Request method "createFromGlobals"
+                 */
+                if (strpos($request->headers->get("CONTENT_TYPE"), "application/x-www-form-urlencoded" === 0)
+                    && in_array(strtoupper($request->server->get("REQUEST_METHOD", "GET")),
+                        ["PUT", "DELETE", "PATCH"])) {
+                    parse_str($request->getContent(), $data);
+                    $request->request = new ParameterBag($data);
+                }
             } else {
-                return Request::createFromGlobals();
+                $request = Request::createFromGlobals();
             }
+
+            return $request;
         };
 
         // new empty Response object
