@@ -119,7 +119,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->once())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_PUT);
+            ->willReturn("PUT");
 
         $request->expects($this->once())
             ->method("getPathInfo")
@@ -206,7 +206,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->any())
             ->method("getPathInfo")
@@ -250,7 +250,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->any())
             ->method("getPathInfo")
@@ -322,7 +322,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->any())
             ->method("getPathInfo")
@@ -379,7 +379,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->any())
             ->method("getPathInfo")
@@ -452,7 +452,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->once())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->once())
             ->method("getPathInfo")
@@ -510,7 +510,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
             ->method("getMethod")
-            ->willReturn(\SlaxWeb\Router\Route::METHOD_GET);
+            ->willReturn("GET");
 
         $request->expects($this->any())
             ->method("getPathInfo")
@@ -579,7 +579,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request->expects($this->any())
             ->method("getMethod")
             ->will(
-                $this->onConsecutiveCalls(\SlaxWeb\Router\Route::METHOD_GET, \SlaxWeb\Router\Route::METHOD_POST)
+                $this->onConsecutiveCalls("GET", "POST")
             );
 
         $request->expects($this->any())

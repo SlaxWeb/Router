@@ -94,7 +94,8 @@ class Dispatcher
      */
     public function dispatch(Request $request, Response $response)
     {
-        $requestMethod = $request->getMethod();
+        $requestMethod = constant("\\SlaxWeb\\Router\\Route::METHOD_"
+            . $request->getMethod());
         $requestUri = ltrim($request->getPathInfo(), "/");
 
         $this->_logger->info(
