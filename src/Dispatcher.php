@@ -150,11 +150,11 @@ class Dispatcher
      * the 404 Route is not found, then null is returned. Otherwise the matching
      * Route object is returned.
      *
-     * @param string $method Request Method
+     * @param int $method Request Method
      * @param string $uri Request Uri
      * @return \SlaxWeb\Router\Route|null
      */
-    protected function _findRoute(string $method, string $uri)
+    protected function _findRoute(int $method, string $uri)
     {
         while (($route = $this->_routes->next()) !== false) {
             if ($route->uri === "404RouteNotFound") {
@@ -162,7 +162,7 @@ class Dispatcher
                 continue;
             }
 
-            if ($method !== $route->method) {
+            if (($route->method & $method) !== $method) {
                 continue;
             }
 

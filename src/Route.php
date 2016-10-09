@@ -74,7 +74,7 @@ class Route
     /**
      * Any Method
      */
-    const METHOD_ANY = 0b100000;
+    const METHOD_ANY = 0b11111;
 
     /**
      * Set Route data
@@ -84,26 +84,16 @@ class Route
      * 'InvalidMethodException' on error.
      *
      * @param string $uri Request URI regex without delimiter
-     * @param string $method HTTP Request Method, accepts METHODO_* constant
+     * @param int $method HTTP Request Method, accepts METHODO_* constant
      * @param callable $action Route action
      * @param bool $default Should the route be marked as default. Default bool(false)
      * @return self
      */
-    public function set(string $uri, string $method, callable $action, bool $default = false): self
+    public function set(string $uri, int $method, callable $action, bool $default = false): self
     {
-        if (in_array(
-            $method,
-            [
-                self::METHOD_GET,
-                self::METHOD_POST,
-                self::METHOD_PUT,
-                self::METHOD_DELETE,
-                self::METHOD_CLI,
-                self::METHOD_ANY
-            ]
-        ) === false) {
+        if ((self::METHOD_ANY & $method) !== $method) {
             throw new Exception\InvalidMethodException(
-                "Route HTTP Method '{$method}' is not valid."
+                "Route does not contain a valid HTTP Method."
             );
         }
 

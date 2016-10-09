@@ -124,7 +124,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->specify(
             "Setter throws exception on invalid method",
             function () {
-                $this->_route->set("uri", "123", function () {
+                $this->_route->set("uri", 12345, function () {
                     return false;
                 });
             },

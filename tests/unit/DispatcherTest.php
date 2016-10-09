@@ -542,6 +542,66 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Multiple Method Route
+     *
+     * Ensure the dispatcher functions properly when multiple HTTP Methods are defined
+     * for a single route
+     *
+     * @return void
+     */
+    public function testMultiMethodRoute()
+    {
+        $route = new \SlaxWeb\Router\Route;
+        $route->set("uri", \SlaxWeb\Router\Route::METHOD_GET | \SlaxWeb\Router\Route::METHOD_POST, function (
+            \SlaxWeb\Router\Request $request,
+            \SlaxWeb\Router\Response $response,
+            $tester
+        ) {
+            $tester->call();
+        }, true);
+
+        // prepare container
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->will(
+                $this->onConsecutiveCalls($route, $route)
+            );
+
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->will(
+                $this->onConsecutiveCalls(\SlaxWeb\Router\Route::METHOD_GET, \SlaxWeb\Router\Route::METHOD_POST)
+            );
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("uri");
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->exactly(2))
+            ->method("call");
+
+        $dispatcher->dispatch($request, $response, $tester);
+        $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
      * Prepare routes
      *
      * Prepare some fake routes for tests.
