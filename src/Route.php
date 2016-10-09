@@ -49,32 +49,32 @@ class Route
     /**
      * Method GET
      */
-    const METHOD_GET = "GET";
+    const METHOD_GET = 0b1;
 
     /**
      * Method POST
      */
-    const METHOD_POST = "POST";
+    const METHOD_POST = 0b10;
 
     /**
      * Method PUT
      */
-    const METHOD_PUT = "PUT";
+    const METHOD_PUT = 0b100;
 
     /**
      * Method DELETE
      */
-    const METHOD_DELETE = "DELETE";
+    const METHOD_DELETE = 0b1000;
 
     /**
      * Method Command Line Interface
      */
-    const METHOD_CLI = "CLI";
+    const METHOD_CLI = 0b10000;
 
     /**
      * Any Method
      */
-    const METHOD_ANY = "ANY";
+    const METHOD_ANY = 0b100000;
 
     /**
      * Set Route data
