@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 /**
  * Response class
  *
@@ -15,8 +16,17 @@
  */
 namespace SlaxWeb\Router;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 class Response extends \Symfony\Component\HttpFoundation\Response
 {
+    /**
+     * Redirect response
+     *
+     * @var \Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    protected $redirect = null;
+
     /**
      * Add To Content
      *
@@ -24,10 +34,55 @@ class Response extends \Symfony\Component\HttpFoundation\Response
      * Response object.
      *
      * @param string $content Content to be added.
-     * @return self
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function addContent($content):self
+    public function addContent(string $content): \Symfony\Component\HttpFoundation\Response
     {
         return $this->setContent($this->getContent() . $content);
+    }
+
+    /**
+     * Redirect
+     *
+     * Creates a new Redirect Response object and stores it to the class property.
+     * If a direct write is requested through the second optional parameter, the
+     * send method is immediatelly called, which is the default behaviour. To avoid
+     * that, bool(false) has to be sent as the second parameter.
+     *
+     * If the first parameter is not a full URL, then it is treated as an URI and
+     * will be appended to the request host.
+     *
+     * @param string $url URL/URI to redirect to
+     * @param bool $write Write response and stop further execution
+     * @return void
+     */
+    public function redirect(string $url, bool $write = true)
+    {
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            $url = $this->getUriForPath($url);
+        }
+
+        $this->redirect = RedirectResponse::create($url);
+        if ($write) {
+            $this->send();
+            exit;
+        }
+    }
+
+    /**
+     * Send
+     *
+     * Override the 'send' method to check if a redirect response has been set,
+     * and send that Response instead. If not, a normal call to the parent 'send'
+     * method is made.
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function send(): \Symfony\Component\HttpFoundation\Response
+    {
+        if ($this->redirect !== null) {
+            return $this->redirect->send();
+        }
+        return parent::send();
     }
 }
