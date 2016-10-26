@@ -67,7 +67,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->specify("HTTP Method is stored", function () {
             $this->assertEquals(
-                "GET",
+                Route::METHOD_GET,
                 $this->_route->method,
                 "HTTP Method not stored"
             );
@@ -124,7 +124,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
         $this->specify(
             "Setter throws exception on invalid method",
             function () {
-                $this->_route->set("uri", "123", function () {
+                $this->_route->set("uri", 12345, function () {
                     return false;
                 });
             },
@@ -169,7 +169,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
             "404 Route set successfully",
             function () {
                 $this->assertEquals("404RouteNotFound", $this->_route->uri);
-                $this->assertEquals("ANY", $this->_route->method);
+                $this->assertEquals(Route::METHOD_ANY, $this->_route->method);
                 $this->assertTrue(($this->_route->action)());
             }
         );
