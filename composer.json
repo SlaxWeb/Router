@@ -18,9 +18,10 @@
         "symfony/http-foundation": "~3.0"
     },
     "require-dev": {
-        "codeception/codeception": "dev-master",
+        "codeception/codeception": "~2.2",
         "codeception/specify": "*",
-        "behat/gherkin": "~4.4"
+        "behat/gherkin": "~4.4",
+        "phpunit/phpunit": "~5.4"
     },
     "suggest": {
         "pimple/pimple": "Make use of available providers for Pimple version 3.0.x"

@@ -135,7 +135,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $tester->expects($this->once())
             ->method("call")
-            ->with("PUT", 2);
+            ->with(\SlaxWeb\Router\Route::METHOD_PUT, 2);
 
         $dispatcher->dispatch($request, $response, $tester);
     }
@@ -222,7 +222,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $tester->expects($this->once())
             ->method("call")
-            ->with("GET", 0);
+            ->with(\SlaxWeb\Router\Route::METHOD_GET, 0);
 
         // normal execution
         $dispatcher->dispatch($request, $response, $tester);
@@ -426,7 +426,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $routeMock = $this->createMock("\\SlaxWeb\\Router\\Route");
         $routeMock->uri = "~^something-to-match-only-through-isDefault$~";
-        $routeMock->method = "GET";
+        $routeMock->method = \SlaxWeb\Router\Route::METHOD_GET;
         $routeMock->isDefault = true;
         $routeMock->action = function (
             \SlaxWeb\Router\Request $request,
@@ -484,7 +484,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testMultipleURIMatches()
     {
         $route = new \SlaxWeb\Router\Route;
-        $route->set("uri1$|^uri2|uri3", "GET", function (
+        $route->set("uri1$|^uri2|uri3", \SlaxWeb\Router\Route::METHOD_GET, function (
             \SlaxWeb\Router\Request $request,
             \SlaxWeb\Router\Response $response,
             $tester
@@ -542,6 +542,66 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Multiple Method Route
+     *
+     * Ensure the dispatcher functions properly when multiple HTTP Methods are defined
+     * for a single route
+     *
+     * @return void
+     */
+    public function testMultiMethodRoute()
+    {
+        $route = new \SlaxWeb\Router\Route;
+        $route->set("uri", \SlaxWeb\Router\Route::METHOD_GET | \SlaxWeb\Router\Route::METHOD_POST, function (
+            \SlaxWeb\Router\Request $request,
+            \SlaxWeb\Router\Response $response,
+            $tester
+        ) {
+            $tester->call();
+        }, true);
+
+        // prepare container
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->will(
+                $this->onConsecutiveCalls($route, $route)
+            );
+
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->will(
+                $this->onConsecutiveCalls("GET", "POST")
+            );
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("uri");
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        // used to see what exactly gets passed to route actions
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->exactly(2))
+            ->method("call");
+
+        $dispatcher->dispatch($request, $response, $tester);
+        $dispatcher->dispatch($request, $response, $tester);
+    }
+
+    /**
      * Prepare routes
      *
      * Prepare some fake routes for tests.
@@ -553,7 +613,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     {
         $routeMock = $this->createMock("\\SlaxWeb\\Router\\Route");
         $routes = [];
-        $methods = ["GET", "POST", "PUT", "DELETE", "CLI", "ANY"];
+        $methods = [
+            \SlaxWeb\Router\Route::METHOD_GET,
+            \SlaxWeb\Router\Route::METHOD_POST,
+            \SlaxWeb\Router\Route::METHOD_PUT,
+            \SlaxWeb\Router\Route::METHOD_DELETE,
+            \SlaxWeb\Router\Route::METHOD_CLI,
+            \SlaxWeb\Router\Route::METHOD_ANY
+        ];
         for ($count = 0; $count < $amount; $count++) {
             $method = $count > (count($methods) - 1)
                 ? $methods[$count % count($methods)]

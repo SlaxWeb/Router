@@ -1,6 +1,8 @@
 <?php
 namespace SlaxWeb\Router\Service;
 
+use SlaxWeb\Router\Route;
+
 /**
  * Route Collection Helper
  *
@@ -12,7 +14,7 @@ namespace SlaxWeb\Router\Service;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.3
+ * @version   0.4
  */
 abstract class RouteCollection implements \Pimple\ServiceProviderInterface
 {
@@ -50,7 +52,7 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
             $newRoute = $container["router.newRoute"];
             $newRoute->set(
                 ($route["uri"] ?? null),
-                ($route["method"] ?? null),
+                ($route["method"] ?? Route::METHOD_GET),
                 ($route["action"] ?? null)
             );
 
