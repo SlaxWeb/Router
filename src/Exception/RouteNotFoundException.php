@@ -1,4 +1,6 @@
 <?php
+namespace SlaxWeb\Router\Exception;
+
 /**
  * Route Not Found Exception
  *
@@ -12,8 +14,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router\Exception;
-
 class RouteNotFoundException extends \Exception
 {
 }

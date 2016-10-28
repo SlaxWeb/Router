@@ -1,4 +1,6 @@
 <?php
+namespace SlaxWeb\Router;
+
 /**
  * Request class
  *
@@ -13,8 +15,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router;
-
 class Request extends \Symfony\Component\HttpFoundation\Request
 {
     /**

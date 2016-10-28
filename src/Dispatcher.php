@@ -1,4 +1,9 @@
 <?php
+namespace SlaxWeb\Router;
+
+use SlaxWeb\Router\Request;
+use SlaxWeb\Router\Response;
+
 /**
  * Dispatcher
  *
@@ -13,11 +18,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router;
-
-use SlaxWeb\Router\Request;
-use SlaxWeb\Router\Response;
-
 class Dispatcher
 {
     /**

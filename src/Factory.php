@@ -1,4 +1,11 @@
 <?php
+namespace SlaxWeb\Router;
+
+use SlaxWeb\Hooks\Factory as Hooks;
+use SlaxWeb\Logger\Factory as Logger;
+use SlaxWeb\Config\Container as Config;
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 /**
  * Factory
  *
@@ -12,13 +19,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router;
-
-use SlaxWeb\Hooks\Factory as Hooks;
-use SlaxWeb\Logger\Factory as Logger;
-use SlaxWeb\Config\Container as Config;
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 class Factory
 {
     /**
@@ -99,7 +99,7 @@ class Factory
                 $method,
                 ${$paramsVarName},
                 $_COOKIE,
-                $_FILES
+                $_FILES,
                 $_SERVER
             );
 

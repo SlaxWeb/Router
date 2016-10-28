@@ -1,4 +1,6 @@
 <?php
+namespace SlaxWeb\Router;
+
 /**
  * Container class of Router component
  *
@@ -12,8 +14,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router;
-
 class Container
 {
     /**

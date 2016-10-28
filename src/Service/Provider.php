@@ -1,4 +1,14 @@
 <?php
+namespace SlaxWeb\Router\Service;
+
+use Pimple\Container;
+use SlaxWeb\Router\Route;
+use SlaxWeb\Router\Request;
+use SlaxWeb\Router\Response;
+use SlaxWeb\Router\Container as RoutesContainer;
+use SlaxWeb\Router\Dispatcher as RouteDispatcher;
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 /**
  * Router Service Provider
  *
@@ -12,16 +22,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router\Service;
-
-use Pimple\Container;
-use SlaxWeb\Router\Route;
-use SlaxWeb\Router\Request;
-use SlaxWeb\Router\Response;
-use SlaxWeb\Router\Container as RoutesContainer;
-use SlaxWeb\Router\Dispatcher as RouteDispatcher;
-use Symfony\Component\HttpFoundation\ParameterBag;
-
 class Provider implements \Pimple\ServiceProviderInterface
 {
     /**

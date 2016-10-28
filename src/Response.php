@@ -1,4 +1,6 @@
 <?php
+namespace SlaxWeb\Router;
+
 /**
  * Response class
  *
@@ -13,8 +15,6 @@
  * @link      https://github.com/slaxweb/
  * @version   0.3
  */
-namespace SlaxWeb\Router;
-
 class Response extends \Symfony\Component\HttpFoundation\Response
 {
     /**
