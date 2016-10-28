@@ -5,5 +5,7 @@
 composer.lock
 vendor/
 .tags
+build/
+docs/
 
 tests/_output/*
