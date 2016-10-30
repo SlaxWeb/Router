@@ -102,11 +102,6 @@ class Dispatcher
             $request->addQuery($this->addQueryParams);
         }
 
-        $params = array_merge(
-            [$request, $response],
-            array_slice(func_get_args(), 2)
-        );
-
         $result = $this->hooks->exec(
             "router.dispatcher.beforeDispatch",
             $route
@@ -118,7 +113,7 @@ class Dispatcher
                 "Executing route definition",
                 ["name" => $route->uri, "action" => $route->action]
             );
-            ($route->action)(...$params);
+            ($route->action)(...func_get_args());
         }
         $this->hooks->exec("router.dispatcher.afterDispatch");
     }
