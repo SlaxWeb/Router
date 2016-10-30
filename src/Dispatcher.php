@@ -173,7 +173,20 @@ class Dispatcher
             return $route;
         }
 
-        $this->hooks->exec("router.dispatcher.routeNotFound");
+        $result = $this->hooks->exec("router.dispatcher.routeNotFound");
+        // check if hook call produced a valid Route object
+        if ($result instanceof Route) {
+            $this->logger->info("No Route found, hook call produced valid Route object, using it instead.");
+            return $result;
+        } elseif (is_array($result)) {
+            foreach ($result as $r) {
+                if ($r instanceof Route) {
+                    $this->logger->info("No Route found, hook call produced valid Route object, using it instead.");
+                    return $r;
+                }
+            }
+        }
+
         if ($notFoundRoute !== null) {
             return $notFoundRoute;
         }
