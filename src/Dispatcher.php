@@ -164,7 +164,6 @@ class Dispatcher
                 continue;
             }
 
-            $this->hooks->exec("router.dispatcher.routeFound", $route);
             $this->logger->info("Route match found");
             if (is_array($matches)) {
                 $this->addParams($matches);

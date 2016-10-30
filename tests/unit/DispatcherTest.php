@@ -158,35 +158,29 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn($routes[0]);
 
         // prepare hooks
-        $this->_hooks->expects($this->exactly(10))
+        $this->_hooks->expects($this->exactly(7))
             ->method("exec")
             ->withConsecutive(
                 // normal execution
                 ["router.dispatcher.afterInit"],
-                ["router.dispatcher.routeFound", $routes[0]],
                 ["router.dispatcher.beforeDispatch", $routes[0]],
                 ["router.dispatcher.afterDispatch"],
                 // stop by returning bool(false)
-                ["router.dispatcher.routeFound", $routes[0]],
                 ["router.dispatcher.beforeDispatch", $routes[0]],
                 ["router.dispatcher.afterDispatch"],
                 // stop by returning [bool(false)]
-                ["router.dispatcher.routeFound", $routes[0]],
                 ["router.dispatcher.beforeDispatch", $routes[0]],
                 ["router.dispatcher.afterDispatch"]
             )->will(
                 $this->onConsecutiveCalls(
                     // normal execution
                     null,
-                    null,
                     "some return value",
                     null,
                     // stop by returning bool(false)
-                    null,
                     false,
                     null,
                     // stop by returning [bool(false)]
-                    null,
                     [false],
                     null
                 )
