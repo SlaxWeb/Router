@@ -98,7 +98,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testRouteExecution()
     {
         // prepare container
-        $routes = $this->_prepareRoutes();
+        $routes = $this->prepareRoutes();
         $this->_container->expects($this->exactly(3))
             ->method("next")
             ->will(
@@ -152,7 +152,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testDispatcherHooks()
     {
         // prepare container
-        $routes = $this->_prepareRoutes(1);
+        $routes = $this->prepareRoutes(1);
         $this->_container->expects($this->any())
             ->method("next")
             ->willReturn($routes[0]);
@@ -244,7 +244,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testRouteNotFound()
     {
         // prepare container
-        $routes = $this->_prepareRoutes(1);
+        $routes = $this->prepareRoutes(1);
 
         // mock the request, response, and a special tester mock
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
@@ -270,7 +270,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $routes[] = clone $routes[0];
         $routes[1]->uri = "404RouteNotFound";
-        $routes[1]->method = "ANY";
+        $routes[1]->method = \SlaxWeb\Router\Route::METHOD_ANY;
         $routes[1]->action = function (
             \SlaxWeb\Router\Request $request,
             \SlaxWeb\Router\Response $response,
@@ -316,7 +316,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testNoRouteException()
     {
         // prepare container
-        $routes = $this->_prepareRoutes(1);
+        $routes = $this->prepareRoutes(1);
 
         // mock the request, response, and a special tester mock
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
@@ -372,7 +372,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testSpecialUriMatchers()
     {
         // prepare container
-        $routes = $this->_prepareRoutes(1);
+        $routes = $this->prepareRoutes(1);
         $routes[0]->uri = "~^test/[:params:]/named/[:named:]$~";
 
         // mock the request, response, and a special tester mock
@@ -609,7 +609,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      * @param int $amount Amount of Routes to return
      * @return array
      */
-    protected function _prepareRoutes(int $amount = 6)
+    protected function prepareRoutes(int $amount = 6)
     {
         $routeMock = $this->createMock("\\SlaxWeb\\Router\\Route");
         $routes = [];
