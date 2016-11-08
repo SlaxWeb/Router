@@ -23,21 +23,21 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
      *
      * @var \Pimple\Container
      */
-    protected $_app = null;
+    protected $app = null;
 
     /**
      * Routes
      *
      * @var array
      */
-    protected $_routes = [];
+    protected $routes = [];
  
     /**
      * Register Service
      *
      * Method called by the Pimple\Container when registering this service.
      * From here the 'define' method is called, and then the protected property
-     * '_routes' is iterated, and all found routes are added to the Route
+     * 'routes' is iterated, and all found routes are added to the Route
      * Container. Also exposes the received DIC to the protected property.
      *
      * @param \Pimple\Container $container DIC
@@ -45,10 +45,10 @@ abstract class RouteCollection implements \Pimple\ServiceProviderInterface
      */
     public function register(\Pimple\Container $container)
     {
-        $this->_app = $container;
+        $this->app = $container;
         $this->define();
 
-        foreach ($this->_routes as $route) {
+        foreach ($this->routes as $route) {
             $newRoute = $container["router.newRoute"];
             $newRoute->set(
                 ($route["uri"] ?? null),

@@ -25,35 +25,28 @@ class Dispatcher
      *
      * @var \SlaxWeb\Router\Container
      */
-    protected $_routes = null;
+    protected $routes = null;
 
     /**
      * Hooks Container
      *
      * @var \SlaxWeb\Hooks\Container
      */
-    protected $_hooks = null;
+    protected $hooks = null;
 
     /**
      * Logger
      *
      * @var \Psr\Log\LoggerInterface
      */
-    protected $_logger = null;
-
-    /**
-     * 404 Route
-     *
-     * @var \SlaxWeb\Router\Route
-     */
-    protected $_404Route = null;
+    protected $logger = null;
 
     /**
      * Additional query params
      *
      * @var array
      */
-    protected $_addQueryParams = [];
+    protected $addQueryParams = [];
 
     /**
      * Class constructor
@@ -70,13 +63,13 @@ class Dispatcher
         \SlaxWeb\Hooks\Container $hooks,
         \Psr\Log\LoggerInterface $logger
     ) {
-        $this->_routes = $routes;
-        $this->_hooks = $hooks;
-        $this->_logger = $logger;
+        $this->routes = $routes;
+        $this->hooks = $hooks;
+        $this->logger = $logger;
 
-        $this->_logger->info("Router Dispatcher initialized");
+        $this->logger->info("Router Dispatcher initialized");
 
-        $this->_hooks->exec("router.dispatcher.afterInit");
+        $this->hooks->exec("router.dispatcher.afterInit");
     }
 
     /**
@@ -94,72 +87,57 @@ class Dispatcher
      */
     public function dispatch(Request $request, Response $response)
     {
+        $method = $request->getMethod();
         $requestMethod = constant("\\SlaxWeb\\Router\\Route::METHOD_"
-            . $request->getMethod());
+            . $method);
         $requestUri = ltrim($request->getPathInfo(), "/");
 
-        $this->_logger->info(
-            "Trying to find match for ({$requestMethod}) '{$requestUri}'"
+        $this->logger->info(
+            "Trying to find match for ({$method}) '{$requestUri}'"
         );
 
-        $route = $this->_findRoute($requestMethod, $requestUri);
-        if ($route === null) {
-            $response->setStatusCode(404);
-            if ($this->_404Route !== null) {
-                $route = $this->_404Route;
-            }
+        $route = $this->findRoute($requestMethod, $requestUri);
+        // add query parameters if defined
+        if (empty($this->addQueryParams) === false) {
+            $request->addQuery($this->addQueryParams);
         }
-        if ($route !== null) {
-            // add query parameters if defined
-            if (empty($this->_addQueryParams) === false) {
-                $request->addQuery($this->_addQueryParams);
-            }
 
-            $params = array_merge(
-                [$request, $response],
-                array_slice(func_get_args(), 2)
+        $result = $this->hooks->exec(
+            "router.dispatcher.beforeDispatch",
+            $route
+        );
+        // check hook results permit route execution
+        if (($result === false
+            || (is_array($result) && in_array(false, $result))) === false) {
+            $this->logger->info(
+                "Executing route definition",
+                ["name" => $route->uri, "action" => $route->action]
             );
-
-            $result = $this->_hooks->exec(
-                "router.dispatcher.beforeDispatch",
-                $route
-            );
-            // check hook results permit route execution
-            if (($result === false
-                || (is_array($result) && in_array(false, $result))) === false) {
-                $this->_logger->info(
-                    "Executing route definition",
-                    ["name" => $route->uri, "action" => $route->action]
-                );
-                ($route->action)(...$params);
-            }
-            $this->_hooks->exec("router.dispatcher.afterDispatch");
-        } else {
-            $this->_logger->error("No Route found, and no 404 Route defined");
-            throw new Exception\RouteNotFoundException(
-                "No Route definition found for Request URI '{$requestUri}' with"
-                . " HTTP Method '{$requestMethod}'"
-            );
+            ($route->action)(...func_get_args());
         }
+        $this->hooks->exec("router.dispatcher.afterDispatch");
     }
 
     /**
      * Find matching Route
      *
      * Find the matching Route based on the Request Method and Request URI. If
-     * no matching route is found, the 404 route is returned, if found. If also
-     * the 404 Route is not found, then null is returned. Otherwise the matching
-     * Route object is returned.
+     * no matching route is found, action from the 404 route is returned, if found.
+     * If also the 404 Route is not found, the 'RouteNotFoundException' is thrown.
+     * Otherwise the matching Route objects action Callable is returned.
      *
      * @param int $method Request Method
      * @param string $uri Request Uri
-     * @return \SlaxWeb\Router\Route|null
+     * @return \SlaxWeb\Router\Route
+     *
+     * @exceptions \SlaxWeb\Router\Exception\RouteNotFoundException
      */
-    protected function _findRoute(int $method, string $uri)
+    protected function findRoute(int $method, string $uri): Route
     {
-        while (($route = $this->_routes->next()) !== false) {
+        $notFoundRoute = null;
+        while (($route = $this->routes->next()) !== false) {
             if ($route->uri === "404RouteNotFound") {
-                $this->_404Route = $route;
+                $notFoundRoute = $route;
                 continue;
             }
 
@@ -173,7 +151,7 @@ class Dispatcher
             }
 
             $uriMatch = preg_match_all(
-                $this->_definedPosix2Pcre($route->uri),
+                $this->posix2Pcre($route->uri),
                 $uri,
                 $matches
             );
@@ -181,18 +159,36 @@ class Dispatcher
                 continue;
             }
 
-            $this->_hooks->exec("router.dispatcher.routeFound", $route);
-            $this->_logger->info("Route match found");
-
+            $this->logger->info("Route match found");
             if (is_array($matches)) {
-                $this->_addParams($matches);
+                $this->addParams($matches);
             }
 
             return $route;
         }
 
-        $this->_hooks->exec("router.dispatcher.routeNotFound");
-        return null;
+        $result = $this->hooks->exec("router.dispatcher.routeNotFound");
+        // check if hook call produced a valid Route object
+        if ($result instanceof Route) {
+            $this->logger->info("No Route found, hook call produced valid Route object, using it instead.");
+            return $result;
+        } elseif (is_array($result)) {
+            foreach ($result as $r) {
+                if ($r instanceof Route) {
+                    $this->logger->info("No Route found, hook call produced valid Route object, using it instead.");
+                    return $r;
+                }
+            }
+        }
+
+        if ($notFoundRoute !== null) {
+            return $notFoundRoute;
+        }
+        $this->logger->error("No Route found, and no 404 Route defined");
+        throw new Exception\RouteNotFoundException(
+            "No Route definition found for Request URI '{$uri}' with"
+            . " HTTP Method '{$method}'"
+        );
     }
 
     /**
@@ -205,7 +201,7 @@ class Dispatcher
      * @param array $names POSIX class names array, default: ["params", "named"]
      * @return string Replaced regexp string
      */
-    protected function _definedPosix2Pcre(
+    protected function posix2Pcre(
         string $regex,
         array $names = ["params", "named"]
     ): string {
@@ -232,12 +228,12 @@ class Dispatcher
      * Add additional parameters
      *
      * Prepares the found matches from the URI and injects them into the
-     * '_addQueryParams' property.
+     * 'addQueryParams' property.
      *
      * @param array $matches Regex matches
      * @return void
      */
-    protected function _addParams(array $matches)
+    protected function addParams(array $matches)
     {
         $params = [];
         foreach ($matches as $key => $value) {
@@ -265,6 +261,6 @@ class Dispatcher
             }
         }
 
-        $this->_addQueryParams = $params;
+        $this->addQueryParams = $params;
     }
 }
