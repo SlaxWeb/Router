@@ -68,8 +68,6 @@ class Dispatcher
         $this->logger = $logger;
 
         $this->logger->info("Router Dispatcher initialized");
-
-        $this->hooks->exec("router.dispatcher.afterInit");
     }
 
     /**
