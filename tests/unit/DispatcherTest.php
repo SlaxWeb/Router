@@ -80,10 +80,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $this->_logger->expects($this->once())
             ->method("info");
 
-        $this->_hooks->expects($this->once())
-            ->method("exec")
-            ->with("router.dispatcher.afterInit");
-
         new Dispatcher($this->_container, $this->_hooks, $this->_logger);
     }
 
@@ -158,11 +154,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn($routes[0]);
 
         // prepare hooks
-        $this->_hooks->expects($this->exactly(7))
+        $this->_hooks->expects($this->exactly(6))
             ->method("exec")
             ->withConsecutive(
                 // normal execution
-                ["router.dispatcher.afterInit"],
                 ["router.dispatcher.beforeDispatch", $routes[0]],
                 ["router.dispatcher.afterDispatch"],
                 // stop by returning bool(false)
@@ -174,7 +169,6 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             )->will(
                 $this->onConsecutiveCalls(
                     // normal execution
-                    null,
                     "some return value",
                     null,
                     // stop by returning bool(false)
@@ -278,10 +272,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn($routes[0], $routes[1], false);
 
         // prepare hooks
-        $this->_hooks->expects($this->exactly(4))
+        $this->_hooks->expects($this->exactly(3))
             ->method("exec")
             ->withConsecutive(
-                ["router.dispatcher.afterInit"],
                 ["router.dispatcher.routeNotFound"],
                 ["router.dispatcher.beforeDispatch", $routes[1]],
                 ["router.dispatcher.afterDispatch"]
