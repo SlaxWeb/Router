@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.3
+ * @version   0.4
  */
 class Factory
 {
