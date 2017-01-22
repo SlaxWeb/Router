@@ -23,28 +23,35 @@ class Route
      *
      * @var string
      */
-    protected $_uri = "";
+    protected $uri = "";
 
     /**
      * Method
      *
      * @var string
      */
-    protected $_method = "";
+    protected $method = "";
 
     /**
      * Action
      *
      * @var callable
      */
-    protected $_callable = null;
+    protected $callable = null;
 
     /**
      * Is default route
      *
      * @var bool
      */
-    protected $_isDefault = false;
+    protected $isDefault = false;
+
+    /**
+     * Magic Getter Property Prepend
+     *
+     * @var string
+     */
+    protected $_getSetPrepend = "";
 
     /**
      * Method GET
@@ -97,10 +104,10 @@ class Route
             );
         }
 
-        $this->_uri = preg_replace("~([^\\\\])\\$?\|\\^?~", "$1$|^", "~^{$uri}$~");
-        $this->_method = $method;
-        $this->_action = $action;
-        $this->_isDefault = $default;
+        $this->uri = preg_replace("~([^\\\\])\\$?\|\\^?~", "$1$|^", "~^{$uri}$~");
+        $this->method = $method;
+        $this->action = $action;
+        $this->isDefault = $default;
 
         return $this;
     }
@@ -116,9 +123,9 @@ class Route
      */
     public function set404Route(callable $action): self
     {
-        $this->_uri = "404RouteNotFound";
-        $this->_method = self::METHOD_ANY;
-        $this->_action = $action;
+        $this->uri = "404RouteNotFound";
+        $this->method = self::METHOD_ANY;
+        $this->action = $action;
 
         return $this;
     }
