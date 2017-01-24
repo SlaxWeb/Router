@@ -88,7 +88,7 @@ class Dispatcher
         $method = $request->getMethod();
         $requestMethod = constant("\\SlaxWeb\\Router\\Route::METHOD_"
             . $method);
-        $requestUri = ltrim($request->getPathInfo(), "/");
+        $requestUri = trim($request->getPathInfo(), "/");
 
         $this->logger->info(
             "Trying to find match for ({$method}) '{$requestUri}'"

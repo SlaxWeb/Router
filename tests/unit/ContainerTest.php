@@ -61,9 +61,6 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->_route = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
             ->setMethods(null)
             ->getMock();
-        $this->_route->uri = "";
-        $this->_route->method = "";
-        $this->_route->action = null;
     }
 
     protected function tearDown()
@@ -111,11 +108,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             ->method("info");
         $container = clone $this->_container;
         $this->specify("Valid Route", function () use ($route, $container) {
-            $route->uri = "~^uri$~";
-            $route->method = "GET";
-            $route->action = function () {
-                return true;
-            };
+            $route->set(
+                "uri",
+                0b1,
+                function () {
+                    return true;
+                }
+            );
             $container->add($route);
         });
     }
@@ -136,11 +135,13 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         for ($count = 0; $count < 5; $count++) {
             $route = clone $this->_route;
 
-            $route->uri = "~^uri" . ($count + 1) ."$~";
-            $route->method = "GET";
-            $route->action = function () use ($count) {
-                return $count;
-            };
+            $route->set(
+                "uri" . ($count + 1),
+                0b1,
+                function () use ($count) {
+                    return $count;
+                }
+            );
             $this->_container->add($route);
         }
 
@@ -148,7 +149,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             $count = 0;
             foreach ($this->_container->getAll() as $route) {
                 $this->assertEquals($count++, ($route->action)());
-                $this->assertEquals("GET", $route->method);
+                $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri{$count}");
             }
         });
@@ -158,7 +159,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             function () {
                 $route = $this->_container->next();
                 $this->assertEquals(0, ($route->action)());
-                $this->assertEquals("GET", $route->method);
+                $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri1");
             }
         );
@@ -168,7 +169,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             function () {
                 $route = $this->_container->prev();
                 $this->assertEquals(4, ($route->action)());
-                $this->assertEquals("GET", $route->method);
+                $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri5");
             }
         );
@@ -179,7 +180,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 $count = 0;
                 while ($route = $this->_container->next()) {
                     $this->assertEquals($count++, ($route->action)());
-                    $this->assertEquals("GET", $route->method);
+                    $this->assertEquals(0b1, $route->method);
                     $this->assertRegExp($route->uri, "uri{$count}");
                 }
             }
@@ -191,7 +192,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                 $count = 5;
                 while ($route = $this->_container->prev()) {
                     $this->assertRegExp($route->uri, "uri" . $count--);
-                    $this->assertEquals("GET", $route->method);
+                    $this->assertEquals(0b1, $route->method);
                     $this->assertEquals($count, ($route->action)());
                 }
             }

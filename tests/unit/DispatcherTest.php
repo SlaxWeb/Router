@@ -256,16 +256,19 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->method("call")
             ->with(404);
 
-        $routes[] = clone $routes[0];
-        $routes[1]->uri = "404RouteNotFound";
-        $routes[1]->method = \SlaxWeb\Router\Route::METHOD_ANY;
-        $routes[1]->action = function (
-            \SlaxWeb\Router\Request $request,
-            \SlaxWeb\Router\Response $response,
-            $tester
-        ) {
-            $tester->call(404);
-        };
+        $routeMock = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+            ->setMethods(null)
+            ->getMock();
+        $routeMock->set404Route(
+            function (
+                \SlaxWeb\Router\Request $request,
+                \SlaxWeb\Router\Response $response,
+                $tester
+            ) {
+                $tester->call(404);
+            }
+        );
+        $routes[] = $routeMock;
 
         $this->_container->expects($this->any())
             ->method("next")
@@ -359,8 +362,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
     public function testSpecialUriMatchers()
     {
         // prepare container
-        $routes = $this->prepareRoutes(1);
-        $routes[0]->uri = "~^test/[:params:]/named/[:named:]$~";
+        $routes = $this->prepareRoutes(1, function($count) {
+            return "test/[:params:]/named/[:named:]";
+        });
 
         // mock the request, response, and a special tester mock
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
@@ -411,17 +415,21 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      */
     public function testDefaultRoute()
     {
-        $routeMock = $this->createMock("\\SlaxWeb\\Router\\Route");
-        $routeMock->uri = "~^something-to-match-only-through-isDefault$~";
-        $routeMock->method = \SlaxWeb\Router\Route::METHOD_GET;
-        $routeMock->isDefault = true;
-        $routeMock->action = function (
-            \SlaxWeb\Router\Request $request,
-            \SlaxWeb\Router\Response $response,
-            $tester
-        ) {
-            $tester->call("method", 1);
-        };
+        $routeMock = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+            ->setMethods(null)
+            ->getMock();
+        $routeMock->set(
+            "something-to-match-only-through-isDefault",
+            \SlaxWeb\Router\Route::METHOD_GET,
+            function (
+                \SlaxWeb\Router\Request $request,
+                \SlaxWeb\Router\Response $response,
+                $tester
+            ) {
+                $tester->call("method", 1);
+            },
+            true
+        );
 
         // prepare container
         $this->_container->expects($this->once())
@@ -594,11 +602,15 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
      * Prepare some fake routes for tests.
      *
      * @param int $amount Amount of Routes to return
+     * @param callable $uriCallback Callback to get custom URI, defaults to null
      * @return array
      */
-    protected function prepareRoutes(int $amount = 6)
+    protected function prepareRoutes(int $amount = 6, callable $uriCallback = null)
     {
         $routeMock = $this->createMock("\\SlaxWeb\\Router\\Route");
+        $routeMock = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+            ->setMethods(null)
+            ->getMock();
         $routes = [];
         $methods = [
             \SlaxWeb\Router\Route::METHOD_GET,
@@ -614,19 +626,25 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 : $methods[$count];
 
             $route = clone $routeMock;
-            $route->uri = "~^uri" . ($count + 1) . "$~";
-            $route->method = $method;
-
-            $route->action = function (
-                \SlaxWeb\Router\Request $request,
-                \SlaxWeb\Router\Response $response,
-                $tester
-            ) use (
-                $count,
-                $method
-            ) {
-                $tester->call($method, $count);
-            };
+            $uri = "uri" . ($count + 1);
+            if ($uriCallback !== null) {
+                $uri = $uriCallback($count);
+            }
+            $route->set(
+                $uri,
+                $method,
+                function (
+                    \SlaxWeb\Router\Request $request,
+                    \SlaxWeb\Router\Response $response,
+                    $tester
+                ) use (
+                    $count,
+                    $method
+                ) {
+                    $tester->call($method, $count);
+                },
+                true
+            );
             $routes[] = $route;
         }
 
