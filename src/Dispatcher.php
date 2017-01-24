@@ -49,6 +49,27 @@ class Dispatcher
     protected $addQueryParams = [];
 
     /**
+     * Segment Based URI Matching
+     *
+     * @var bool
+     */
+    protected $segBasedMatch = false;
+
+    /**
+     * Controller namespace
+     *
+     * @var string
+     */
+    protected $ctrlrNamespace = "";
+
+    /**
+     * Default Controller Method
+     *
+     * @var string
+     */
+    protected $ctrlrDefaultMethod = "";
+
+    /**
      * Class constructor
      *
      * Set retrieved Routes Container, Hooks Container, and the Logger to the
@@ -114,6 +135,27 @@ class Dispatcher
             ($route->action)(...func_get_args());
         }
         $this->hooks->exec("router.dispatcher.afterDispatch");
+    }
+
+    /**
+     * Enable segment Based URI Matching
+     *
+     * Enables the segment based URI matching, sets the Controller namespace, and
+     * the default method to call if the second segment is not found in the URI.
+     * Default method has the default value of string("index").
+     *
+     * @param string $namespace Controller namespace
+     * @param string $defaultMethod Default controller method for single segment URIs
+     * @return \SlaxWeb\Router\Dispatcher
+     */
+    public function enableSegMatching(
+        string $namespace,
+        string $defaultMethod = "index"
+    ): Dispatcher {
+        $this->segBasedMatch = true;
+        $this->ctrlrNamespace = $namespace;
+        $this->ctrlrDefaultMethod = $defaultMethod;
+        return $this;
     }
 
     /**
