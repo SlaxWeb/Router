@@ -254,7 +254,7 @@ class Dispatcher
      *
      * @return \SlaxWeb\Router\Route|null
      */
-    public function routeNotFoundHook()
+    protected function routeNotFoundHook()
     {
         $result = $this->hooks->exec("router.dispatcher.routeNotFound");
         // check if hook call produced a valid Route object
