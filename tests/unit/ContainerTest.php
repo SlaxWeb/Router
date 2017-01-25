@@ -28,21 +28,21 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      *
      * @var \SlaxWeb\Router\Container
      */
-    protected $_container = null;
+    protected $container = null;
 
     /**
      * Route Mock
      *
      * @var mocked object
      */
-    protected $_route = null;
+    protected $route = null;
 
     /**
      * Logger Mock
      *
      * @var mocked object
      */
-    protected $_logger = null;
+    protected $logger = null;
 
     /**
      * Prepare test
@@ -54,11 +54,11 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->_logger = $this->createMock("\\Psr\\Log\\LoggerInterface");
+        $this->logger = $this->createMock("\\Psr\\Log\\LoggerInterface");
 
-        $this->_container = new Container($this->_logger);
+        $this->container = new Container($this->logger);
 
-        $this->_route = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
+        $this->route = $this->getMockBuilder("\\SlaxWeb\\Router\\Route")
             ->setMethods(null)
             ->getMock();
     }
@@ -79,7 +79,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $exception = false;
         try {
-            $this->_container->add(new \stdClass);
+            $this->container->add(new \stdClass);
         } catch (\TypeError $e) {
             $exception = true;
         }
@@ -87,26 +87,26 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             throw new \Exception("'TypeError' was expected but was not thrown");
         }
 
-        $route = clone $this->_route;
+        $route = clone $this->route;
 
-        $logger = clone $this->_logger;
+        $logger = clone $this->logger;
         $logger->expects($this->once())
             ->method("error");
         $logger->expects($this->once())
             ->method("debug");
-        $container = clone $this->_container;
+        $container = clone $this->container;
         $this->specify(
             "Route definition incomplete",
             function () use ($route, $container) {
                 $container->add($route);
             },
-            ["throws" => "SlaxWeb\\Router\\Exception\\RouteIncompleteException"]
-        );
+                ["throws" => "SlaxWeb\\Router\\Exception\\RouteIncompleteException"]
+            );
 
-        $logger = clone $this->_logger;
+        $logger = clone $this->logger;
         $logger->expects($this->once())
             ->method("info");
-        $container = clone $this->_container;
+        $container = clone $this->container;
         $this->specify("Valid Route", function () use ($route, $container) {
             $route->set(
                 "uri",
@@ -133,7 +133,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testRouteRetrieval()
     {
         for ($count = 0; $count < 5; $count++) {
-            $route = clone $this->_route;
+            $route = clone $this->route;
 
             $route->set(
                 "uri" . ($count + 1),
@@ -142,12 +142,12 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
                     return $count;
                 }
             );
-            $this->_container->add($route);
+            $this->container->add($route);
         }
 
         $this->specify("All definitons retrieved", function () {
             $count = 0;
-            foreach ($this->_container->getAll() as $route) {
+            foreach ($this->container->getAll() as $route) {
                 $this->assertEquals($count++, ($route->action)());
                 $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri{$count}");
@@ -157,7 +157,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->specify(
             "'next' returns first Route on first call",
             function () {
-                $route = $this->_container->next();
+                $route = $this->container->next();
                 $this->assertEquals(0, ($route->action)());
                 $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri1");
@@ -167,7 +167,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $this->specify(
             "'prev' returns last Route on first call",
             function () {
-                $route = $this->_container->prev();
+                $route = $this->container->prev();
                 $this->assertEquals(4, ($route->action)());
                 $this->assertEquals(0b1, $route->method);
                 $this->assertRegExp($route->uri, "uri5");
@@ -178,7 +178,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             "Itteration with 'next' possible",
             function () {
                 $count = 0;
-                while ($route = $this->_container->next()) {
+                while ($route = $this->container->next()) {
                     $this->assertEquals($count++, ($route->action)());
                     $this->assertEquals(0b1, $route->method);
                     $this->assertRegExp($route->uri, "uri{$count}");
@@ -190,11 +190,51 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
             "Itteration with 'prev' possible",
             function () {
                 $count = 5;
-                while ($route = $this->_container->prev()) {
+                while ($route = $this->container->prev()) {
                     $this->assertRegExp($route->uri, "uri" . $count--);
                     $this->assertEquals(0b1, $route->method);
                     $this->assertEquals($count, ($route->action)());
                 }
+            }
+        );
+    }
+
+    public function testDefaultRoute()
+    {
+        $route = clone $this->route->set(
+            "default_route1",
+            0b1,
+            function () {},
+            true
+        );
+        $this->container->add($route);
+        $route = clone $this->route->set(
+            "default_route2",
+            0b1,
+            function () {},
+            true
+        );
+        $this->container->add($route);
+        $this->specify(
+            "'defaultRoute' returns the first default route",
+            function () {
+                $route = $this->container->defaultRoute();
+                $this->assertInstanceOf(\SlaxWeb\Router\Route::class, $route);
+                $this->assertRegExp($route->uri, "default_route1");
+            }
+        );
+    }
+
+    public function test404Route()
+    {
+        $route = clone $this->route->set404Route(function () {});
+        $this->container->add($route);
+        $this->specify(
+            "'get404Route' returns the first 404 route",
+            function () {
+                $route = $this->container->get404Route();
+                $this->assertInstanceOf(\SlaxWeb\Router\Route::class, $route);
+                $this->assertEquals($route->uri, "404RouteNotFound");
             }
         );
     }
