@@ -47,6 +47,13 @@ class Route
     protected $isDefault = false;
 
     /**
+     * Is 404 route
+     *
+     * @var bool
+     */
+    protected $is404 = false;
+
+    /**
      * Magic Getter Property Prepend
      *
      * @var string
@@ -126,6 +133,7 @@ class Route
         $this->uri = "404RouteNotFound";
         $this->method = self::METHOD_ANY;
         $this->action = $action;
+        $this->is404 = true;
 
         return $this;
     }
