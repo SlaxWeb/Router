@@ -596,6 +596,167 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $dispatcher->dispatch($request, $response, $tester);
     }
 
+    /*
+     * Test Segment Based URI matching
+     *
+     * Ensure the Segment Based URI matching executes the default method in the
+     * controller, the URI provided method, that it will ignore URI prepends and
+     * try to match by segments only URIs that begin with the prepend, and that
+     * further URI segments will be converted to controller method parameters.
+     *
+     * The above tests are broken down into three methods bellow, each dependant
+     * on the former.
+     */
+    public function testSegmentBasedDefaultMethod()
+    {
+        // init the dispatcher
+        $dispatcher = new Dispatcher(
+            $this->_container,
+            $this->_hooks,
+            $this->_logger
+        );
+
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("MockController");
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("customDefault");
+
+        $dispatcher->enableSegMatch(
+            "\\SlaxWeb\\Router\\Tests\\Unit",
+            $tester,
+            "",
+            "customDefault"
+        );
+
+        $dispatcher->dispatch($request, $response, $tester);
+
+        return $dispatcher;
+    }
+
+    /**
+     * @depends testSegmentBasedDefaultMethod
+     */
+    public function testSegmentBasedPrepend($dispatcher)
+    {
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->will(
+                $this->onConsecutiveCalls(
+                    "uri/prepend/MockController",
+                    "falsePrepend/MockController"
+                )
+            );
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("customDefault");
+
+        $dispatcher->enableSegMatch(
+            "\\SlaxWeb\\Router\\Tests\\Unit",
+            $tester,
+            "uri/prepend/",
+            "customDefault"
+        );
+
+        $dispatcher->dispatch($request, $response);
+        try {
+            $dispatcher->dispatch($request, $response, $tester);
+        } catch (\SlaxWeb\Router\Exception\RouteNotFoundException $e) {}
+
+        return $dispatcher;
+    }
+
+    /**
+     * @depends testSegmentBasedDefaultMethod
+     */
+    public function testSegmentBasedMethod($dispatcher)
+    {
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("MockController/uriMethod");
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("uriMethod");
+
+        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", $tester);
+
+        $dispatcher->dispatch($request, $response);
+    }
+
+    /**
+     * @depends testSegmentBasedMethod
+     */
+    public function testSegmentBasedParams($dispatcher)
+    {
+        // mock the request, response, and a special tester mock
+        $request = $this->createMock("\\SlaxWeb\\Router\\Request");
+        $request->expects($this->any())
+            ->method("getMethod")
+            ->willReturn("GET");
+
+        $request->expects($this->any())
+            ->method("getPathInfo")
+            ->willReturn("MockController/methodWithParams/param");
+
+        $response = $this->createMock(
+            "\\SlaxWeb\\Router\\Response"
+        );
+
+        $tester = $this->getMockBuilder("FakeTesterMock")
+            ->setMethods(["call"])
+            ->getMock();
+        $tester->expects($this->once())
+            ->method("call")
+            ->with("uriMethod", "param");
+
+        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", $tester);
+
+        $dispatcher->dispatch($request, $response);
+    }
+
     /**
      * Prepare routes
      *
