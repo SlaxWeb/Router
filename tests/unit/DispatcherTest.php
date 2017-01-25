@@ -272,7 +272,11 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $this->_container->expects($this->any())
             ->method("next")
-            ->willReturn($routes[0], $routes[1], false);
+            ->willReturn($routes[0], false);
+
+        $this->_container->expects($this->any())
+            ->method("get404Route")
+            ->willReturn($routes[1]);
 
         // prepare hooks
         $this->_hooks->expects($this->exactly(3))
@@ -433,7 +437,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         // prepare container
         $this->_container->expects($this->once())
-            ->method("next")
+            ->method("defaultRoute")
             ->willReturn($routeMock);
 
         // init the dispatcher
@@ -484,14 +488,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             \SlaxWeb\Router\Response $response,
             $tester
         ) {
-            $tester->call($request->getPathInfo(), 1);
+            $tester->call($request->getPathInfo());
         }, true);
 
         // prepare container
         $this->_container->expects($this->any())
             ->method("next")
             ->will(
-                $this->onConsecutiveCalls($route, $route, $route, $route, false)
+                $this->onConsecutiveCalls($route, $route, $route, false)
             );
 
         // init the dispatcher
@@ -510,7 +514,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $request->expects($this->any())
             ->method("getPathInfo")
             ->will(
-                $this->onConsecutiveCalls("/", "/", "/uri1", "/uri1", "/uri2", "/uri2", "/uri3", "/uri3")
+                $this->onConsecutiveCalls("/uri1", "/uri1", "/uri2", "/uri2", "/uri3", "/uri3")
             );
 
         $response = $this->createMock(
@@ -521,16 +525,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         $tester = $this->getMockBuilder("FakeTesterMock")
             ->setMethods(["call"])
             ->getMock();
-        $tester->expects($this->exactly(4))
+        $tester->expects($this->exactly(3))
             ->method("call")
             ->withConsecutive(
-                ["/", 1],
-                ["/uri1", 1],
-                ["/uri2", 1],
-                ["/uri3", 1]
+                ["/uri1"],
+                ["/uri2"],
+                ["/uri3"]
             );
 
-        $dispatcher->dispatch($request, $response, $tester);
         $dispatcher->dispatch($request, $response, $tester);
         $dispatcher->dispatch($request, $response, $tester);
         $dispatcher->dispatch($request, $response, $tester);
