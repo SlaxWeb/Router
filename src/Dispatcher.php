@@ -319,8 +319,8 @@ class Dispatcher
         }
         $controller = rtrim($this->segBasedMatch["controller"]["namespace"], "\\")
             . "\\"
-            . $matches[1];
-        $method = $matches[2] ?? $this->segBasedMatch["controller"]["defaultMethod"];
+            . ucfirst($matches[1]);
+        $method = lcfirst($matches[2]) ?? $this->segBasedMatch["controller"]["defaultMethod"];
         $params = explode("/", $matches[3] ?? "");
 
         if (method_exists($controller, $method) === false) {
