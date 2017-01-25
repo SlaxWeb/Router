@@ -124,7 +124,11 @@ class Dispatcher
         );
 
         if (($route = $this->findRoute($requestMethod, $requestUri)) === null) {
-            if (($route = $this->handleNoMatch()) === null) {
+            if ((
+                    $this->segBasedMatch["enabled"] === false
+                    || $this->dispatchController($requestUri) === false
+                ) && ($route = $this->handleNoMatch()) === null
+            ) {
                 // no route could be found, time to bail out
                 $this->logger->error("No Route found, and no 404 Route defined");
                 throw new Exception\RouteNotFoundException(
@@ -282,6 +286,64 @@ class Dispatcher
             );
             ($route->action)(...$params);
         }
+    }
+
+    /**
+     * Dispatch request to controller
+     *
+     * Try and match the Request URI with an existing controller and its method.
+     * If such match is found, dispatch the request to said controller and method,
+     * and return bool(true) upon successful execution. If a match is not found
+     * bool(false) is returned.
+     *
+     * @param string $uri Request URI string
+     * @return bool
+     */
+    protected function dispatchController(string $uri)
+    {
+        $this->logger->info(
+            "Attempting to match the Request URI with an existing controller and method"
+        );
+
+        $prepend = "";
+        if ($this->segBasedMatch["uriPrepend"] !== "") {
+            $prepend = "(?:{$this->segBasedMatch["uriPrepend"]}){1}";
+        }
+        $regex = "~^{$prepend}(.+?)(?:/(.*?)(?:/(.*?))?)?$~";
+        if (preg_match($regex, $uri, $matches) === 0) {
+            $this->logger->error(
+                "URI does not contain valid data to be matched with a controller method",
+                ["uri" => $uri]
+            );
+            return false;
+        }
+        $controller = rtrim($this->segBasedMatch["controller"]["namespace"], "\\")
+            . "\\"
+            . $matches[1];
+        $method = $matches[2] ?? $this->segBasedMatch["controller"]["defaultMethod"];
+        $params = explode("/", $matches[3] ?? "");
+
+        if (method_exists($controller, $method) === false) {
+            $this->logger->error(
+                "Controller or method do not exist or are not accessible.",
+                ["controller" => $controller, "method" => $method]
+            );
+            return false;
+        }
+
+        $this->hooks->exec("router.dispatcher.beforeDispatch");
+        $this->logger->debug(
+            "Matched request URI with a controller and method. Executing with parsed parameters",
+            [
+                "uri"           =>  $uri,
+                "controller"    =>  $controller,
+                "method"        =>  $method,
+                "params"        =>  $params
+            ]
+        );
+        (new $controller(...$this->segBasedMatch["controller"]["params"]))
+            ->{$method}(...$params);
+        return true;
     }
 
     /**
