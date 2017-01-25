@@ -135,20 +135,7 @@ class Dispatcher
         if (empty($this->addQueryParams) === false) {
             $request->addQuery($this->addQueryParams);
         }
-
-        $result = $this->hooks->exec(
-            "router.dispatcher.beforeDispatch",
-            $route
-        );
-        // check hook results permit route execution
-        if (($result === false
-            || (is_array($result) && in_array(false, $result))) === false) {
-            $this->logger->info(
-                "Executing route definition",
-                ["name" => $route->uri, "action" => $route->action]
-            );
-            ($route->action)(...func_get_args());
-        }
+        $this->dispatchRoute($route, func_get_args());
         $this->hooks->exec("router.dispatcher.afterDispatch");
     }
 
@@ -270,6 +257,32 @@ class Dispatcher
             }
         }
         return null;
+    }
+
+    /**
+     * Dispatch route
+     *
+     * Dispatch the route by executing its action.
+     *
+     * @param \SlaxWeb\Router\Route $route Route object
+     * @param array $params Array of parameters for the Route action
+     * @return void
+     */
+    protected function dispatchRoute(Route $route, array $params)
+    {
+        $result = $this->hooks->exec(
+            "router.dispatcher.beforeDispatch",
+            $route
+        );
+        // check hook results permit route execution
+        if (($result === false
+            || (is_array($result) && in_array(false, $result))) === false) {
+            $this->logger->info(
+                "Executing route definition",
+                ["name" => $route->uri, "action" => $route->action]
+            );
+            ($route->action)(...$params);
+        }
     }
 
     /**
