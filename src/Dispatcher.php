@@ -82,6 +82,8 @@ class Dispatcher
      * @param \SlaxWeb\Router\Reponse $response Response object
      * @param mixed $unknown Any further parameter is sent to Route action
      * @return void
+     *
+     * @exceptions \SlaxWeb\Router\Exception\RouteNotFoundException
      */
     public function dispatch(Request $request, Response $response)
     {
@@ -94,7 +96,15 @@ class Dispatcher
             "Trying to find match for ({$method}) '{$requestUri}'"
         );
 
-        $route = $this->findRoute($requestMethod, $requestUri);
+        if (($route = $this->findRoute($requestMethod, $requestUri)) === null) {
+            // no route could be found, time to bail out
+            $this->logger->error("No Route found, and no 404 Route defined");
+            throw new Exception\RouteNotFoundException(
+                "No Route definition found for Request URI '{$requestUri}' with"
+                . " HTTP Method '{$method}'"
+            );
+        }
+
         // add query parameters if defined
         if (empty($this->addQueryParams) === false) {
             $request->addQuery($this->addQueryParams);
@@ -119,41 +129,52 @@ class Dispatcher
     /**
      * Find matching Route
      *
-     * Find the matching Route based on the Request Method and Request URI. If
-     * no matching route is found, action from the 404 route is returned, if found.
-     * If also the 404 Route is not found, the 'RouteNotFoundException' is thrown.
-     * Otherwise the matching Route objects action Callable is returned.
+     * Try and obtain the route that bests fits the request and return it. If no
+     * such route is found, and no 404 route exists, nor is one returned from a
+     * 'routeNotFound' hook execution, null is returned.
      *
      * @param int $method Request Method
      * @param string $uri Request Uri
-     * @return \SlaxWeb\Router\Route
-     *
-     * @exceptions \SlaxWeb\Router\Exception\RouteNotFoundException
+     * @return \SlaxWeb\Router\Route|null
      */
-    protected function findRoute(int $method, string $uri): Route
+    protected function findRoute(int $method, string $uri)
     {
-        $notFoundRoute = null;
-        while (($route = $this->routes->next()) !== false) {
-            if ($route->uri === "404RouteNotFound") {
-                $notFoundRoute = $route;
-                continue;
-            }
+        $route = null;
+        // if URI is empty and a default route is set, use it instead
+        if ($uri !== ""
+            || ($route = $this->routes->defaultRoute()) === null
+        ) {
+            $route = $this->checkContainer($method, $uri);
+        }
 
+        // if route is still null execute the 'routeNotFound' hook, and if no route
+        // is found, try and obtain the 404 route from the container
+        if ($route === null
+            && ($route = $this->routeNotFoundHook()) === null
+        ) {
+            $route = $this->routes->get404Route();
+        }
+        return $route;
+    }
+
+    /**
+     * Check Routes Container
+     *
+     * Iterates the routes container and tries to match the request to a Route in
+     * the container. Returns the matching Route object if found, or null otherwise.
+     *
+     * @param int $method Request Method
+     * @param string $uri Request Uri
+     * @return \SlaxWeb\Router\Route|null
+     */
+    protected function checkContainer(int $method, string $uri)
+    {
+        while (($route = $this->routes->next()) !== false) {
             if (($route->method & $method) !== $method) {
                 continue;
             }
 
-            // Default URI, check if default route?
-            if ($uri === "" && $route->isDefault) {
-                return $route;
-            }
-
-            $uriMatch = preg_match_all(
-                $this->posix2Pcre($route->uri),
-                $uri,
-                $matches
-            );
-            if ($uriMatch === 0) {
+            if (preg_match_all($this->posix2Pcre($route->uri), $uri, $matches) === 0) {
                 continue;
             }
 
@@ -164,7 +185,20 @@ class Dispatcher
 
             return $route;
         }
+        return null;
+    }
 
+    /**
+     * Execute Route Not Found Hook
+     *
+     * Execute the Route Not Found Hook definition with the help of the Hook component
+     * and return a valid Route object if it is found in the Hook execution return
+     * data.
+     *
+     * @return \SlaxWeb\Router\Route|null
+     */
+    public function routeNotFoundHook()
+    {
         $result = $this->hooks->exec("router.dispatcher.routeNotFound");
         // check if hook call produced a valid Route object
         if ($result instanceof Route) {
@@ -178,15 +212,7 @@ class Dispatcher
                 }
             }
         }
-
-        if ($notFoundRoute !== null) {
-            return $notFoundRoute;
-        }
-        $this->logger->error("No Route found, and no 404 Route defined");
-        throw new Exception\RouteNotFoundException(
-            "No Route definition found for Request URI '{$uri}' with"
-            . " HTTP Method '{$method}'"
-        );
+        return null;
     }
 
     /**
@@ -215,8 +241,8 @@ class Dispatcher
                     $changed = "(?P<{$type}{$counters[$type]}>.+?)";
                     return $changed;
                 },
-                $regex
-            );
+                    $regex
+                );
         }
 
         return $regex;
