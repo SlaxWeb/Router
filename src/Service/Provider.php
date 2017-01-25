@@ -66,7 +66,7 @@ class Provider implements \Pimple\ServiceProviderInterface
 
             $config = $cont["config.service"];
             if ($config["app.segmentBasedMatch"] === true) {
-                $dispatcher->enable->enableSegMatch(
+                $dispatcher->enableSegMatch(
                     $config["app.controllerNamespace"],
                     $cont,
                     $config["app.segmentBasedUriPrepend"],
