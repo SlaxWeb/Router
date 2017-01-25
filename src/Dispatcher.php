@@ -51,23 +51,28 @@ class Dispatcher
     /**
      * Segment Based URI Matching
      *
-     * @var bool
-     */
-    protected $segBasedMatch = false;
-
-    /**
-     * Controller namespace
+     * On array of settings for Segment Based URI matching. Cotnains the following
+     * keys:
+     * enabled - false - Is Segment Based URI matching enabled
+     * uriPrepend - "" - URI prepend, only URIs prepended with this prepend are
+     *                   used for Segment Based URI matching
+     * controller: - controller settings
+     *    namespace - "" - Controller namespace
+     *    defaultMethod - "" - Default method for the controller if the segment
+     *                         for the controller method is not found in the URI
+     *    params - [] - Controller constructor parameters
      *
-     * @var string
+     * @var array
      */
-    protected $ctrlrNamespace = "";
-
-    /**
-     * Default Controller Method
-     *
-     * @var string
-     */
-    protected $ctrlrDefaultMethod = "";
+    protected $segBasedMatch = [
+        "enabled"       =>  false,
+        "uriPrepend"    =>  "",
+        "controller"    =>  [
+            "namespace"     =>  "",
+            "defaultMethod" =>  "",
+            "params"        =>  []
+        ]
+    ];
 
     /**
      * Class constructor
@@ -145,16 +150,26 @@ class Dispatcher
      * Default method has the default value of string("index").
      *
      * @param string $namespace Controller namespace
+     * @param array $params Controller constructor parameters
+     * @param string $prepend URI prepend for segment based URI matching
      * @param string $defaultMethod Default controller method for single segment URIs
      * @return \SlaxWeb\Router\Dispatcher
      */
-    public function enableSegMatching(
+    public function enableSegMatch(
         string $namespace,
+        array $params = [],
+        string $prepend = "",
         string $defaultMethod = "index"
     ): Dispatcher {
-        $this->segBasedMatch = true;
-        $this->ctrlrNamespace = $namespace;
-        $this->ctrlrDefaultMethod = $defaultMethod;
+        $this->segBasedMatch = [
+            "enabled"       =>  true,
+            "uriPrepend"    =>  $prepend,
+            "controller"    =>  [
+                "namespace"     =>  $namespace,
+                "defaultMethod" =>  $defaultMethod,
+                "params"        =>  $params
+            ]
+        ];
         return $this;
     }
 
