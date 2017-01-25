@@ -618,6 +618,11 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             $this->_logger
         );
 
+        // prepare container
+        $this->_container->expects($this->any())
+            ->method("next")
+            ->willReturn(false);
+
         // mock the request, response, and a special tester mock
         $request = $this->createMock("\\SlaxWeb\\Router\\Request");
         $request->expects($this->any())
@@ -641,7 +646,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher->enableSegMatch(
             "\\SlaxWeb\\Router\\Tests\\Unit",
-            $tester,
+            [$tester],
             "",
             "customDefault"
         );
@@ -684,7 +689,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher->enableSegMatch(
             "\\SlaxWeb\\Router\\Tests\\Unit",
-            $tester,
+            [$tester],
             "uri/prepend/",
             "customDefault"
         );
@@ -723,9 +728,11 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->method("call")
             ->with("uriMethod");
 
-        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", $tester);
+        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", [$tester]);
 
         $dispatcher->dispatch($request, $response);
+
+        return $dispatcher;
     }
 
     /**
@@ -752,9 +759,9 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $tester->expects($this->once())
             ->method("call")
-            ->with("uriMethod", "param");
+            ->with("methodWithParams", "param");
 
-        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", $tester);
+        $dispatcher->enableSegMatch("\\SlaxWeb\\Router\\Tests\\Unit", [$tester]);
 
         $dispatcher->dispatch($request, $response);
     }
