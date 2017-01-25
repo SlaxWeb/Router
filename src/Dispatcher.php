@@ -134,11 +134,14 @@ class Dispatcher
             }
         }
 
-        // add query parameters if defined
-        if (empty($this->addQueryParams) === false) {
-            $request->addQuery($this->addQueryParams);
+        if ($route !== null) {
+            // add query parameters if defined
+            if (empty($this->addQueryParams) === false) {
+                $request->addQuery($this->addQueryParams);
+            }
+            $this->dispatchRoute($route, func_get_args());
         }
-        $this->dispatchRoute($route, func_get_args());
+
         $this->hooks->exec("router.dispatcher.afterDispatch");
     }
 
