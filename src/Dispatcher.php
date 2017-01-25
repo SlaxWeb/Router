@@ -320,7 +320,7 @@ class Dispatcher
         $controller = rtrim($this->segBasedMatch["controller"]["namespace"], "\\")
             . "\\"
             . ucfirst($matches[1]);
-        $method = lcfirst($matches[2]) ?? $this->segBasedMatch["controller"]["defaultMethod"];
+        $method = lcfirst($matches[2] ?? $this->segBasedMatch["controller"]["defaultMethod"]);
         $params = explode("/", $matches[3] ?? "");
 
         if (method_exists($controller, $method) === false) {
