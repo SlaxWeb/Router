@@ -21,21 +21,21 @@ class Container
      *
      * @var array
      */
-    protected $_routes = [];
+    protected $routes = [];
 
     /**
      * Current Route
      *
      * @var \SlaxWeb\Router\Route
      */
-    protected $_currentRoute = null;
+    protected $currentRoute = null;
 
     /**
      * Logger
      *
      * @var \Psr\Log\LoggerInterface
      */
-    protected $_logger = null;
+    protected $logger = null;
 
     /**
      * Class constructor
@@ -47,9 +47,9 @@ class Container
      */
     public function __construct(\Psr\Log\LoggerInterface $logger)
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
 
-        $this->_logger->info("Route Container initialized");
+        $this->logger->info("Route Container initialized");
     }
 
     /**
@@ -66,16 +66,16 @@ class Container
         if ($route->uri === ""
             || $route->method === ""
             || $route->action === null) {
-            $this->_logger->error("Route incomplete. Unable to add");
-            $this->_logger->debug("Incomplete Route", [$route]);
+            $this->logger->error("Route incomplete. Unable to add");
+            $this->logger->debug("Incomplete Route", [$route]);
             throw new Exception\RouteIncompleteException(
                 "Retrieved Route is not complete and can not be stored"
             );
         }
 
-        $this->_routes[] = $route;
+        $this->routes[] = $route;
 
-        $this->_logger->info(
+        $this->logger->info(
             "Route successfully added to Container",
             ["uri" => $route->uri]
         );
@@ -92,7 +92,7 @@ class Container
      */
     public function getAll(): array
     {
-        return $this->_routes;
+        return $this->routes;
     }
 
     /**
@@ -106,10 +106,10 @@ class Container
     public function next()
     {
         $func = "next";
-        if ($this->_currentRoute === null) {
+        if ($this->currentRoute === null) {
             $func = "current";
         }
-        return $this->_iterateRoutes($func);
+        return $this->iterateRoutes($func);
     }
 
     /**
@@ -123,10 +123,10 @@ class Container
     public function prev()
     {
         $func = "prev";
-        if ($this->_currentRoute === null) {
+        if ($this->currentRoute === null) {
             $func = "end";
         }
-        return $this->_iterateRoutes($func);
+        return $this->iterateRoutes($func);
     }
 
     /**
@@ -139,11 +139,11 @@ class Container
      * @param string $function Function name for array iteration
      * @return \SlaxWeb\Router\Route|bool
      */
-    protected function _iterateRoutes(string $function)
+    protected function iterateRoutes(string $function)
     {
-        if (($route = $function($this->_routes)) !== false) {
-            $this->_currentRoute = $route;
-            return $this->_currentRoute;
+        if (($route = $function($this->routes)) !== false) {
+            $this->currentRoute = $route;
+            return $this->currentRoute;
         }
         return false;
     }
