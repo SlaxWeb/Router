@@ -49,6 +49,32 @@ class Dispatcher
     protected $addQueryParams = [];
 
     /**
+     * Segment Based URI Matching
+     *
+     * On array of settings for Segment Based URI matching. Cotnains the following
+     * keys:
+     * enabled - false - Is Segment Based URI matching enabled
+     * uriPrepend - "" - URI prepend, only URIs prepended with this prepend are
+     *                   used for Segment Based URI matching
+     * controller: - controller settings
+     *    namespace - "" - Controller namespace
+     *    defaultMethod - "" - Default method for the controller if the segment
+     *                         for the controller method is not found in the URI
+     *    params - [] - Controller constructor parameters
+     *
+     * @var array
+     */
+    protected $segBasedMatch = [
+        "enabled"       =>  false,
+        "uriPrepend"    =>  "",
+        "controller"    =>  [
+            "namespace"     =>  "",
+            "defaultMethod" =>  "",
+            "params"        =>  []
+        ]
+    ];
+
+    /**
      * Class constructor
      *
      * Set retrieved Routes Container, Hooks Container, and the Logger to the
@@ -76,7 +102,8 @@ class Dispatcher
      * Dispatch the Request to the propper Route. Tries to find a matching Route
      * for the retrieved Request object, and calls that Routes action callable
      * along with Response, and any other input parameters as arguments for the
-     * action.
+     * action. If Segment based URI matching is enabled, the dispatcher will try
+     * to route the incoming request to a matched controller and method.
      *
      * @param \SlaxWeb\Router\Request $request Request object
      * @param \SlaxWeb\Router\Reponse $response Response object
@@ -97,33 +124,60 @@ class Dispatcher
         );
 
         if (($route = $this->findRoute($requestMethod, $requestUri)) === null) {
-            // no route could be found, time to bail out
-            $this->logger->error("No Route found, and no 404 Route defined");
-            throw new Exception\RouteNotFoundException(
-                "No Route definition found for Request URI '{$requestUri}' with"
-                . " HTTP Method '{$method}'"
-            );
+            if ((
+                    $this->segBasedMatch["enabled"] === false
+                    || $this->dispatchController($requestUri) === false
+                ) && ($route = $this->handleNoMatch()) === null
+            ) {
+                // no route could be found, time to bail out
+                $this->logger->error("No Route found, and no 404 Route defined");
+                throw new Exception\RouteNotFoundException(
+                    "No Route definition found for Request URI '{$requestUri}' "
+                    . "with HTTP Method '{$method}'"
+                );
+            }
         }
 
-        // add query parameters if defined
-        if (empty($this->addQueryParams) === false) {
-            $request->addQuery($this->addQueryParams);
+        if ($route !== null) {
+            // add query parameters if defined
+            if (empty($this->addQueryParams) === false) {
+                $request->addQuery($this->addQueryParams);
+            }
+            $this->dispatchRoute($route, func_get_args());
         }
 
-        $result = $this->hooks->exec(
-            "router.dispatcher.beforeDispatch",
-            $route
-        );
-        // check hook results permit route execution
-        if (($result === false
-            || (is_array($result) && in_array(false, $result))) === false) {
-            $this->logger->info(
-                "Executing route definition",
-                ["name" => $route->uri, "action" => $route->action]
-            );
-            ($route->action)(...func_get_args());
-        }
         $this->hooks->exec("router.dispatcher.afterDispatch");
+    }
+
+    /**
+     * Enable segment Based URI Matching
+     *
+     * Enables the segment based URI matching, sets the Controller namespace, and
+     * the default method to call if the second segment is not found in the URI.
+     * Default method has the default value of string("index").
+     *
+     * @param string $namespace Controller namespace
+     * @param array $params Controller constructor parameters
+     * @param string $prepend URI prepend for segment based URI matching
+     * @param string $defaultMethod Default controller method for single segment URIs
+     * @return \SlaxWeb\Router\Dispatcher
+     */
+    public function enableSegMatch(
+        string $namespace,
+        array $params = [],
+        string $prepend = "",
+        string $defaultMethod = "index"
+    ): Dispatcher {
+        $this->segBasedMatch = [
+            "enabled"       =>  true,
+            "uriPrepend"    =>  $prepend,
+            "controller"    =>  [
+                "namespace"     =>  $namespace,
+                "defaultMethod" =>  $defaultMethod,
+                "params"        =>  $params
+            ]
+        ];
+        return $this;
     }
 
     /**
@@ -144,15 +198,7 @@ class Dispatcher
         if ($uri !== ""
             || ($route = $this->routes->defaultRoute()) === null
         ) {
-            $route = $this->checkContainer($method, $uri);
-        }
-
-        // if route is still null execute the 'routeNotFound' hook, and if no route
-        // is found, try and obtain the 404 route from the container
-        if ($route === null
-            && ($route = $this->routeNotFoundHook()) === null
-        ) {
-            $route = $this->routes->get404Route();
+            return $this->checkContainer($method, $uri);
         }
         return $route;
     }
@@ -189,15 +235,16 @@ class Dispatcher
     }
 
     /**
-     * Execute Route Not Found Hook
+     * Handle No Matching Route Found
      *
      * Execute the Route Not Found Hook definition with the help of the Hook component
      * and return a valid Route object if it is found in the Hook execution return
-     * data.
+     * data. If no valid route is returned by the hook, try to obtain the 404 route
+     * from the Route Container object and return it.
      *
      * @return \SlaxWeb\Router\Route|null
      */
-    public function routeNotFoundHook()
+    protected function handleNoMatch()
     {
         $result = $this->hooks->exec("router.dispatcher.routeNotFound");
         // check if hook call produced a valid Route object
@@ -212,7 +259,91 @@ class Dispatcher
                 }
             }
         }
-        return null;
+        return $this->routes->get404Route();
+    }
+
+    /**
+     * Dispatch route
+     *
+     * Dispatch the route by executing its action.
+     *
+     * @param \SlaxWeb\Router\Route $route Route object
+     * @param array $params Array of parameters for the Route action
+     * @return void
+     */
+    protected function dispatchRoute(Route $route, array $params)
+    {
+        $result = $this->hooks->exec(
+            "router.dispatcher.beforeDispatch",
+            $route
+        );
+        // check hook results permit route execution
+        if (($result === false
+            || (is_array($result) && in_array(false, $result))) === false) {
+            $this->logger->info(
+                "Executing route definition",
+                ["name" => $route->uri, "action" => $route->action]
+            );
+            ($route->action)(...$params);
+        }
+    }
+
+    /**
+     * Dispatch request to controller
+     *
+     * Try and match the Request URI with an existing controller and its method.
+     * If such match is found, dispatch the request to said controller and method,
+     * and return bool(true) upon successful execution. If a match is not found
+     * bool(false) is returned.
+     *
+     * @param string $uri Request URI string
+     * @return bool
+     */
+    protected function dispatchController(string $uri)
+    {
+        $this->logger->info(
+            "Attempting to match the Request URI with an existing controller and method"
+        );
+
+        $prepend = "";
+        if ($this->segBasedMatch["uriPrepend"] !== "") {
+            $prepend = "(?:{$this->segBasedMatch["uriPrepend"]}){1}";
+        }
+        $regex = "~^{$prepend}(.+?)(?:/(.*?)(?:/(.*?))?)?$~";
+        if (preg_match($regex, $uri, $matches) === 0) {
+            $this->logger->error(
+                "URI does not contain valid data to be matched with a controller method",
+                ["uri" => $uri]
+            );
+            return false;
+        }
+        $controller = rtrim($this->segBasedMatch["controller"]["namespace"], "\\")
+            . "\\"
+            . ucfirst($matches[1]);
+        $method = lcfirst($matches[2] ?? $this->segBasedMatch["controller"]["defaultMethod"]);
+        $params = explode("/", $matches[3] ?? "");
+
+        if (method_exists($controller, $method) === false) {
+            $this->logger->error(
+                "Controller or method do not exist or are not accessible.",
+                ["controller" => $controller, "method" => $method]
+            );
+            return false;
+        }
+
+        $this->hooks->exec("router.dispatcher.beforeDispatch");
+        $this->logger->debug(
+            "Matched request URI with a controller and method. Executing with parsed parameters",
+            [
+                "uri"           =>  $uri,
+                "controller"    =>  $controller,
+                "method"        =>  $method,
+                "params"        =>  $params
+            ]
+        );
+        (new $controller(...$this->segBasedMatch["controller"]["params"]))
+            ->{$method}(...$params);
+        return true;
     }
 
     /**

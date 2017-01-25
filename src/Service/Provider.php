@@ -58,11 +58,22 @@ class Provider implements \Pimple\ServiceProviderInterface
          * registered prior to instantiating the Dispatcher
          */
         $container["routeDispatcher.service"] = function (Container $cont) {
-            return new RouteDispatcher(
+            $dispatcher = new RouteDispatcher(
                 $cont["routesContainer.service"],
                 $cont["hooks.service"],
                 $cont["logger.service"]("System")
             );
+
+            $config = $cont["config.service"];
+            if ($config["app.segmentBasedMatch"] === true) {
+                $dispatcher->enableSegMatch(
+                    $config["app.controllerNamespace"],
+                    [$cont],
+                    $config["app.segmentBasedUriPrepend"],
+                    $config["app.segmentBasedDefaultMethod"]
+                );
+            }
+            return $dispatcher;
         };
 
         // new Request object from superglobals or pre set base url

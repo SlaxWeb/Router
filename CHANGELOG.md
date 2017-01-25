@@ -5,6 +5,10 @@ Changes between versions
 ## Current changes
 * remove existing trailing slash from Request URI before attempting to find a matching
 route
+* 'router.dispatcher.beforeDispatch' will not be executed without the Route object,
+if segment-based URI matching is enabled, and the request matches a controller and
+method
+* added segment-based URI matching
 
 ## v0.4
 
