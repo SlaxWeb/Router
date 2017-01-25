@@ -38,6 +38,20 @@ class Container
     protected $logger = null;
 
     /**
+     * Default route
+     *
+     * @var \SlaxWeb\Router\Route
+     */
+    protected $defaultRoute = null;
+
+    /**
+     * 404 Route
+     *
+     * @var \SlaxWeb\Router\Rotue
+     */
+    protected $e404Route = null;
+
+    /**
      * Class constructor
      *
      * Store the retrieved logger that implements the \Psr\Log\LoggerInterface
@@ -73,6 +87,34 @@ class Container
             );
         }
 
+        // store default route
+        if ($route->isDefault) {
+            if ($this->defaultRoute === null) {
+                $this->defaultRoute = $route;
+            } else {
+                $this->logger->debug(
+                    "Default route already added to container, skipping add.",
+                    ["route" => $route, "storedDefault" => $this->defaultRoute]
+                );
+            }
+        }
+
+        // store 404 route
+        if ($route->is404) {
+            if ($this->e404Route === null) {
+                $this->e404Route = $route;
+                $this->logger->info("404 route added to Route Container");
+            } else {
+                $this->logger->debug(
+                    "404 route already added to container, skipping add.",
+                    ["route" => $route, "stored404" => $this->e404Route]
+                );
+            }
+
+            return $this;
+        }
+
+        // store route to regular container
         $this->routes[] = $route;
 
         $this->logger->info(
@@ -81,6 +123,32 @@ class Container
         );
 
         return $this;
+    }
+
+    /**
+     * Get default route
+     *
+     * Returns the default route if set. If the default Route is not set, it returns
+     * null.
+     *
+     * @return \SlaxWeb\Router\Route|null
+     */
+    public function defaultRoute()
+    {
+        return $this->defaultRoute;
+    }
+
+    /**
+     * Get the 404 route
+     *
+     * Returns the 404 route if set. If the 404 Route is not set, it returns
+     * null.
+     *
+     * @return \SlaxWeb\Router\Route|null
+     */
+    public function get404Route()
+    {
+        return $this->e404Route;
     }
 
     /**
