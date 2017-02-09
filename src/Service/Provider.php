@@ -113,7 +113,7 @@ class Provider implements \Pimple\ServiceProviderInterface
             return new Response;
         };
 
-        $this->setAppProperties();
+        $this->setAppProperties($container);
     }
 
     /**
