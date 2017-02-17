@@ -47,7 +47,7 @@ class Container
     /**
      * 404 Route
      *
-     * @var \SlaxWeb\Router\Rotue
+     * @var \SlaxWeb\Router\Route
      */
     protected $e404Route = null;
 
