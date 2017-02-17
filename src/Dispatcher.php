@@ -364,7 +364,7 @@ class Dispatcher
         foreach ($names as $type) {
             $regex = preg_replace_callback(
                 "~\[:{$type}:\]~",
-                function (array $matches) use (&$counters, $type) {
+                function() use (&$counters, $type) {
                     if (isset($counters[$type]) === false) {
                         $counters[$type] = 0;
                     }
