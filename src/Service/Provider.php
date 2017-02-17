@@ -35,7 +35,7 @@ class Provider implements \Pimple\ServiceProviderInterface
     public function register(Container $container)
     {
         // new Route class instance
-        $container["router.newRoute"] = $container->factory(function () {
+        $container["router.newRoute"] = $container->factory(function() {
             return new Route;
         });
 
@@ -45,7 +45,7 @@ class Provider implements \Pimple\ServiceProviderInterface
          * Requires the Logger Service Provider to be registered prior to its
          * own instantiation.
          */
-        $container["routesContainer.service"] = function (Container $cont) {
+        $container["routesContainer.service"] = function(Container $cont) {
             return new RoutesContainer($cont["logger.service"]("System"));
         };
 
@@ -57,7 +57,7 @@ class Provider implements \Pimple\ServiceProviderInterface
          * Dispatcher. Just make sure all required service providers are
          * registered prior to instantiating the Dispatcher
          */
-        $container["routeDispatcher.service"] = function (Container $cont) {
+        $container["routeDispatcher.service"] = function(Container $cont) {
             $dispatcher = new RouteDispatcher(
                 $cont["routesContainer.service"],
                 $cont["hooks.service"],
@@ -77,7 +77,7 @@ class Provider implements \Pimple\ServiceProviderInterface
         };
 
         // new Request object from superglobals or pre set base url
-        $container["request.service"] = function (Container $cont) {
+        $container["request.service"] = function(Container $cont) {
             if (isset($cont["requestParams"])) {
                 $method = $cont["requestParams"]["method"] ?? $_SERVER["REQUEST_METHOD"];
                 $request = Request::create(
@@ -107,7 +107,7 @@ class Provider implements \Pimple\ServiceProviderInterface
         };
 
         // new empty Response object
-        $container["response.service"] = function () {
+        $container["response.service"] = function() {
             return new Response;
         };
 
