@@ -138,7 +138,7 @@ class Dispatcher
             }
         }
 
-        if ($route !== null) {
+        if (empty($route) === false && $route instanceof Route) {
             // add query parameters if defined
             if (empty($this->addQueryParams) === false) {
                 $request->addQuery($this->addQueryParams);
