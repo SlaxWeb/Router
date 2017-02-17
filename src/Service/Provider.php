@@ -78,10 +78,8 @@ class Provider implements \Pimple\ServiceProviderInterface
 
         // new Request object from superglobals or pre set base url
         $container["request.service"] = function (Container $cont) {
-            $request = null;
             if (isset($cont["requestParams"])) {
                 $method = $cont["requestParams"]["method"] ?? $_SERVER["REQUEST_METHOD"];
-                $paramsVarName = $method === "POST" ? "_POST" : "_GET";
                 $request = Request::create(
                     $cont["requestParams"]["uri"],
                     $method,
