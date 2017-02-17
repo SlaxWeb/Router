@@ -97,7 +97,7 @@ class Provider implements \Pimple\ServiceProviderInterface
                     && in_array(strtoupper($request->server->get("REQUEST_METHOD", "GET")),
                         ["PUT", "DELETE", "PATCH"])) {
                     parse_str($request->getContent(), $data);
-                    $request->request = new ParameterBag($data);
+                    $request->request = new ParameterBag($data ?? []);
                 }
             } else {
                 $request = Request::createFromGlobals();
