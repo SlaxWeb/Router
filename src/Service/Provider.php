@@ -93,7 +93,7 @@ class Provider implements \Pimple\ServiceProviderInterface
                  * prepare request parameters from request content, copy from
                  * Symfony Http Foundation Request method "createFromGlobals"
                  */
-                if (strpos($request->headers->get("CONTENT_TYPE"), "application/x-www-form-urlencoded" === 0)
+                if (strpos($request->headers->get("CONTENT_TYPE"), "application/x-www-form-urlencoded") === 0
                     && in_array(strtoupper($request->server->get("REQUEST_METHOD", "GET")),
                         ["PUT", "DELETE", "PATCH"])) {
                     parse_str($request->getContent(), $data);
