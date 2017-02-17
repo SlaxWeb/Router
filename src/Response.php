@@ -49,19 +49,12 @@ class Response extends \Symfony\Component\HttpFoundation\Response
      * send method is immediatelly called, which is the default behaviour. To avoid
      * that, bool(false) has to be sent as the second parameter.
      *
-     * If the first parameter is not a full URL, then it is treated as an URI and
-     * will be appended to the request host.
-     *
-     * @param string $url URL/URI to redirect to
+     * @param string $url URL to redirect to
      * @param bool $write Write response and stop further execution
      * @return void
      */
     public function redirect(string $url, bool $write = true)
     {
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
-            $url = $this->getUriForPath($url);
-        }
-
         $this->redirect = RedirectResponse::create($url);
         if ($write) {
             $this->send();
