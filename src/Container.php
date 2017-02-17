@@ -78,7 +78,7 @@ class Container
     public function add(Route $route): self
     {
         if ($route->uri === ""
-            || $route->method === ""
+            || $route->method === 0b0
             || $route->action === null) {
             $this->logger->error("Route incomplete. Unable to add");
             $this->logger->debug("Incomplete Route", [$route]);
