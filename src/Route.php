@@ -43,7 +43,7 @@ class Route
      *
      * @var callable
      */
-    protected $callable = null;
+    protected $action = null;
 
     /**
      * Is default route
