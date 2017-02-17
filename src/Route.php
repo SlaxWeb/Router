@@ -13,6 +13,8 @@ namespace SlaxWeb\Router;
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
  * @version   0.4
+ *
+ * @property string $uri
  */
 class Route
 {
