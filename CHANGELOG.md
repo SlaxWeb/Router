@@ -2,15 +2,23 @@
 
 Changes between versions
 
-## Current changes
+## v0.5
+
+### v0.5.0
+
 * remove existing trailing slash from Request URI before attempting to find a matching
 route
-* 'router.dispatcher.beforeDispatch' will not be executed without the Route object,
+* *router.dispatcher.beforeDispatch* will not be executed without the Route object,
 if segment-based URI matching is enabled, and the request matches a controller and
 method
 * added segment-based URI matching
 
 ## v0.4
+
+### v0.4.1
+
+* stop attempting to create a valid URL in response with the request host, let http
+protocol handle it
 
 ### v0.4.0
 
