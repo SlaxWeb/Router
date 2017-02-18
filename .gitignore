@@ -7,5 +7,6 @@ vendor/
 .tags
 build/
 docs/
+tests/_support/_generated/
 
 tests/_output/*
