@@ -27,7 +27,11 @@
     },
     "autoload": {
         "psr-4": {
-            "SlaxWeb\\Router\\": "src/",
+            "SlaxWeb\\Router\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "SlaxWeb\\Router\\Tests\\Unit\\": "tests/unit/"
         }
     },
