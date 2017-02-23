@@ -2,6 +2,11 @@
 
 Changes between versions
 
+## Current changes
+
+* remove service provider
+* remove factory
+
 ## v0.5
 
 ### v0.5.0
