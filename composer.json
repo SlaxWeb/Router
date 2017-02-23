@@ -10,9 +10,9 @@
     ],
     "require": {
         "php":">=7.0.0",
-        "slaxweb/hooks": "~0.5",
-        "slaxweb/logger": "~0.4",
-        "slaxweb/config": "~0.2",
+        "slaxweb/hooks": "dev-master",
+        "slaxweb/logger": "dev-master",
+        "slaxweb/config": "dev-master",
         "slaxweb/getset": "~0.1",
         "symfony/http-foundation": "~3.0"
     },
