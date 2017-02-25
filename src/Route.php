@@ -157,4 +157,27 @@ class Route
 
         return $this;
     }
+
+    /**
+     * Set hook
+     *
+     * Sets a hook name for the pre or post dispatch hook name to be executed before
+     * or after the Route has been dispatched. Takes the name of the hook as the
+     * first argument, and a bool value as the second. If ommited or set to false,
+     * the hook name will be used pre dispatch event, and post dispatch event if
+     * set to true.
+     *
+     * @param string $hook Name of the hook to be executed
+     * @param bool $post Defines if the hook is to be executed pre or post dispatch, default bool(false)
+     * @return self
+     */
+    public function setHook(string $hook, bool $post = false): self
+    {
+        if ($post) {
+            $this->postDispatch = $hook;
+            return $this;
+        }
+        $this->preDispatch = $hook;
+        return $this;
+    }
 }
