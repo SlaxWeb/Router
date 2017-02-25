@@ -60,6 +60,20 @@ class Route
     protected $is404 = false;
 
     /**
+     * Pre dispatch hook
+     *
+     * @var string
+     */
+    protected $preDispatch = "";
+
+    /**
+     * Post dispatch hook
+     *
+     * @var string
+     */
+    protected $postDispatch = "";
+
+    /**
      * Magic Getter Property Prepend
      *
      * @var string
