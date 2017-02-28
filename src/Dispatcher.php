@@ -143,10 +143,14 @@ class Dispatcher
             if (empty($this->addQueryParams) === false) {
                 $request->addQuery($this->addQueryParams);
             }
-            $this->dispatchRoute($route, func_get_args());
-        }
 
-        $this->hooks->exec("router.dispatcher.afterDispatch");
+            $this->dispatchRoute($route, func_get_args());
+            if ($route->afterDispatch !== "") {
+                $this->hooks->exec($route->afterDispatch);
+            } else {
+                $this->hooks->exec("router.dispatcher.afterDispatch");
+            }
+        }
     }
 
     /**
@@ -273,10 +277,12 @@ class Dispatcher
      */
     protected function dispatchRoute(Route $route, array $params)
     {
-        $result = $this->hooks->exec(
-            "router.dispatcher.beforeDispatch",
-            $route
-        );
+        if ($route->preDispatch !== "") {
+            $result = $this->hooks->exec($route->preDispatch, $route);
+        } else {
+            $result = $this->hooks->exec("router.dispatcher.beforeDispatch", $route);
+        }
+
         // check hook results permit route execution
         if (($result === false
             || (is_array($result) && in_array(false, $result))) === false) {
