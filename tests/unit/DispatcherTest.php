@@ -154,7 +154,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
             ->willReturn($routes[0]);
 
         // prepare hooks
-        $this->_hooks->expects($this->exactly(6))
+        $this->_hooks->expects($this->exactly(8))
             ->method("exec")
             ->withConsecutive(
                 // normal execution
@@ -165,7 +165,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 ["router.dispatcher.afterDispatch"],
                 // stop by returning [bool(false)]
                 ["router.dispatcher.beforeDispatch", $routes[0]],
-                ["router.dispatcher.afterDispatch"]
+                ["router.dispatcher.afterDispatch"],
+                // route specific hook execution and stop by returning [bool(false)]
+                ["routePreDispatch", $routes[0]],
+                ["routeAfterDispatch"]
             )->will(
                 $this->onConsecutiveCalls(
                     // normal execution
@@ -176,11 +179,14 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                     null,
                     // stop by returning [bool(false)]
                     [false],
+                    null,
+                    // stop by returning [bool(false)]
+                    [false],
                     null
                 )
             );
 
-        $this->_logger->expects($this->exactly(8))
+        $this->_logger->expects($this->any())
             ->method("info");
 
         // init the dispatcher
@@ -217,6 +223,10 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         // stopped execution through hooks return value bool(false)
         $dispatcher->dispatch($request, $response, $tester);
         // stopped execution through hooks return value [bool(false)]
+        $dispatcher->dispatch($request, $response, $tester);
+        // route specific hook execution and stop by returning [bool(false)]
+        $routes[0]->setHook("routePreDispatch");
+        $routes[0]->setHook("routeAfterDispatch", true);
         $dispatcher->dispatch($request, $response, $tester);
     }
 
