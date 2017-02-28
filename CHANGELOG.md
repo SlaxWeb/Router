@@ -6,6 +6,7 @@ Changes between versions
 
 * remove service provider
 * remove factory
+* route specific before/after dispatch hooks
 
 ## v0.5
 
