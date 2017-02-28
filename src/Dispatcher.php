@@ -123,6 +123,10 @@ class Dispatcher
             "Trying to find match for ({$method}) '{$requestUri}'"
         );
 
+        // check if a route exist for the request
+        // if that fails attempt to dispatch to a controller as seg based match, if enabled
+        // if that fails, try to handle a "NoMatch"
+        // if all fails throw exception
         if (($route = $this->findRoute($requestMethod, $requestUri)) === null
             && ($this->segBasedMatch["enabled"] === false
                 || $this->dispatchController($requestUri) === false)
