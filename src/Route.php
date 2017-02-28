@@ -19,6 +19,8 @@ namespace SlaxWeb\Router;
  * @property callable $action
  * @property bool $isDefault
  * @property bool $is404
+ * @property string $preDispatch
+ * @property string $afterDispatch
  */
 class Route
 {
