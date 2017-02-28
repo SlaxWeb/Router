@@ -123,19 +123,17 @@ class Dispatcher
             "Trying to find match for ({$method}) '{$requestUri}'"
         );
 
-        if (($route = $this->findRoute($requestMethod, $requestUri)) === null) {
-            if ((
-                    $this->segBasedMatch["enabled"] === false
-                    || $this->dispatchController($requestUri) === false
-                ) && ($route = $this->handleNoMatch()) === null
-            ) {
-                // no route could be found, time to bail out
-                $this->logger->error("No Route found, and no 404 Route defined");
-                throw new Exception\RouteNotFoundException(
-                    "No Route definition found for Request URI '{$requestUri}' "
-                    . "with HTTP Method '{$method}'"
-                );
-            }
+        if (($route = $this->findRoute($requestMethod, $requestUri)) === null
+            && ($this->segBasedMatch["enabled"] === false
+                || $this->dispatchController($requestUri) === false)
+            && ($route = $this->handleNoMatch()) === null
+        ) {
+            // no route could be found, time to bail out
+            $this->logger->error("No Route found, and no 404 Route defined");
+            throw new Exception\RouteNotFoundException(
+                "No Route definition found for Request URI '{$requestUri}' "
+                . "with HTTP Method '{$method}'"
+            );
         }
 
         if (empty($route) === false && $route instanceof Route) {
