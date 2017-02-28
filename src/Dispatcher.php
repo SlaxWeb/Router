@@ -279,8 +279,8 @@ class Dispatcher
      */
     protected function dispatchRoute(Route $route, array $params)
     {
-        if ($route->preDispatch !== "") {
-            $result = $this->hooks->exec($route->preDispatch, $route);
+        if ($route->beforeDispatch !== "") {
+            $result = $this->hooks->exec($route->beforeDispatch, $route);
         } else {
             $result = $this->hooks->exec("router.dispatcher.beforeDispatch", $route);
         }

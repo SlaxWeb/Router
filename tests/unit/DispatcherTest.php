@@ -167,7 +167,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
                 ["router.dispatcher.beforeDispatch", $routes[0]],
                 ["router.dispatcher.afterDispatch"],
                 // route specific hook execution and stop by returning [bool(false)]
-                ["routePreDispatch", $routes[0]],
+                ["routeBeforeDispatch", $routes[0]],
                 ["routeAfterDispatch"]
             )->will(
                 $this->onConsecutiveCalls(
@@ -225,7 +225,7 @@ class DispatcherTest extends \PHPUnit_Framework_TestCase
         // stopped execution through hooks return value [bool(false)]
         $dispatcher->dispatch($request, $response, $tester);
         // route specific hook execution and stop by returning [bool(false)]
-        $routes[0]->setHook("routePreDispatch");
+        $routes[0]->setHook("routeBeforeDispatch");
         $routes[0]->setHook("routeAfterDispatch", true);
         $dispatcher->dispatch($request, $response, $tester);
     }
