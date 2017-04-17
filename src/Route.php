@@ -12,7 +12,7 @@ namespace SlaxWeb\Router;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  *
  * @property string $uri
  * @property int $method

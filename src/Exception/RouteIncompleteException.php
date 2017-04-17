@@ -12,7 +12,7 @@ namespace SlaxWeb\Router\Exception;
  * @copyright 2016 (c) Tomaz Lovrec
  * @license   MIT <https://opensource.org/licenses/MIT>
  * @link      https://github.com/slaxweb/
- * @version   0.4
+ * @version   0.6
  */
 class RouteIncompleteException extends \Exception
 {
