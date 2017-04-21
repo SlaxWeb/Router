@@ -133,7 +133,13 @@ class Route
             );
         }
 
-        $this->uri = preg_replace("~([^\\\\])\\$?\|\\^?~", "$1$|^", "~^{$uri}$~");
+        $this->uri = "~";
+        foreach (explode("|", $uri) as $uri) {
+            $uri = trim($uri, "^$");
+            // add /? to every uri that does not already end with a /<quaantifier>
+            $this->uri .= "^" . preg_replace("~/$|(?:(?<!/)[+*?]|[^+*?])\K$~", "/?", $uri) . "$|";
+        }
+        $this->uri = rtrim($this->uri, "|") . "~";
         $this->method = $method;
         $this->action = $action;
         $this->isDefault = $default;

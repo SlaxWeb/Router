@@ -59,7 +59,7 @@ class RouteTest extends \PHPUnit_Framework_TestCase
 
         $this->specify("URI is stored in regex format", function () {
             $this->assertEquals(
-                "~^uri$~",
+                "~^uri/?$~",
                 $this->_route->uri,
                 "URI is not in regex format"
             );
@@ -108,6 +108,26 @@ class RouteTest extends \PHPUnit_Framework_TestCase
                 "Defined route is not default route"
             );
 
+        });
+    }
+
+    public function testMultipleRoutes()
+    {
+        $this->_route->set(
+            "foo/bar/+$|baz/qux/|^optional/trail/?|no/trail",
+            Route::METHOD_GET,
+            function () {
+                return true;
+            },
+            true
+        );
+
+        $this->specify("Multiple URIs are parsed correctly", function () {
+            $this->assertEquals(
+                "~^foo/bar/+$|^baz/qux/?$|^optional/trail/?$|^no/trail/?$~",
+                $this->_route->uri,
+                "URI is not in regex format"
+            );
         });
     }
 
